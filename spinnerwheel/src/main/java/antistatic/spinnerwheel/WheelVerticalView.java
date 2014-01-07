@@ -32,6 +32,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 
+import com.example.spinnerwheel.R;
+
 /**
  * Spinner wheel vertical view.
  *

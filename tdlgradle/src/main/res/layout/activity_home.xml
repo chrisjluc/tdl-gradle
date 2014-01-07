@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal"
+        android:id="@+id/yearMonthLayout"
+        android:layout_alignParentTop="true">
+
+        <antistatic.spinnerwheel.WheelHorizontalView
+            android:id="@+id/whvMonth"
+            app:visibleItems="1"
+            app:selectionDividerWidth="1px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <antistatic.spinnerwheel.WheelHorizontalView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/whvYear"
+            app:visibleItems="1"
+            app:selectionDividerWidth="1px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <antistatic.spinnerwheel.WheelHorizontalView
+        android:id="@+id/whvCalendar"
+        android:layout_below="@+id/yearMonthLayout"
+        app:visibleItems="5"
+        app:selectionDividerWidth="1px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <ListView
+        android:id="@+id/lvTasks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rlAddBar"
+        android:layout_below="@+id/whvCalendar"
+        android:orientation="horizontal"></ListView>
+
+    <RelativeLayout
+        android:id="@+id/rlAddBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/black">
+
+        <EditText
+            android:layout_marginTop="4dp"
+            android:padding="8dp"
+            android:id="@+id/etTaskTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/bAdd"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"
+            android:background="@android:color/background_light"
+            android:hint="Add a new task..."
+            android:ems="10"></EditText>
+
+
+        <ImageButton
+            android:layout_marginTop="8dp"
+            android:id="@+id/bAdd"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/add"
+            android:focusable="true" />
+    </RelativeLayout>
+
+</RelativeLayout>

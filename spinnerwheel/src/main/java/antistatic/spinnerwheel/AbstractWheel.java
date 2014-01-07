@@ -34,6 +34,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
+
+import com.example.spinnerwheel.R;
+
 import antistatic.spinnerwheel.adapters.WheelViewAdapter;
 
 import java.util.LinkedList;
