@@ -53,7 +53,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     List<TdlDate> dates;
     List<String> years;
     ListView lvTasks;
-    TaskAdapter taskAdapter;
+    AlphaInAnimationAdapter alphaInAnimationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +64,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         setUpSpinners();
         setupDatabase();
         tasks = getTasksList();
-        taskAdapter = new TaskAdapter(getApplicationContext(), getTasksList());
-        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
+        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
         alphaInAnimationAdapter.setAbsListView(lvTasks);
         alphaInAnimationAdapter.setInitialDelayMillis(500);
-        lvTasks.setAdapter(taskAdapter);
+        lvTasks.setAdapter(alphaInAnimationAdapter);
 
         // if (findViewById(R.id.taskfragment) != null) {
         // if (savedInstanceState != null) {
@@ -134,7 +134,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
                 .build();
         task.saveModel();
         tasks.add(0, task);
-        taskAdapter.notifyDataSetChanged();
+        alphaInAnimationAdapter.notifyDataSetChanged();
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
