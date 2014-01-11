@@ -55,10 +55,10 @@
         android:background="@android:color/black">
 
         <EditText
-            android:layout_marginTop="4dp"
-            android:padding="8dp"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
             android:id="@+id/etTaskTitle"
-            android:layout_width="fill_parent"
+            android:layout_width="530dp"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/bAdd"
             android:singleLine="true"
@@ -72,13 +72,13 @@
 
 
         <ImageButton
-            android:layout_marginTop="8dp"
+            android:layout_margin="14dp"
             android:id="@+id/bAdd"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:background="@drawable/add"
+            android:background="@drawable/ic_add_archive"
             android:focusable="true" />
     </RelativeLayout>
 
