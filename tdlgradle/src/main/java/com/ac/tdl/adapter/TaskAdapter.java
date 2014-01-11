@@ -54,6 +54,11 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
 
     private String createHashtagString(Hashtag[] array){
         StringBuilder hashtagBuilder = new StringBuilder();
+
+        if (array == null) {
+            return "";
+        }
+
         for (Hashtag hashtag : array){
             hashtagBuilder.append(" #" + hashtag.getLabel());
         }
