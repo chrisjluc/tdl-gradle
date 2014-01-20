@@ -58,17 +58,13 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setDates();
         setUpActionBar();
         setUpViews();
         setUpSpinners();
         setupDatabase();
-        tasks = getTasksList();
-        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-        alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
-        alphaInAnimationAdapter.setAbsListView(lvTasks);
-        alphaInAnimationAdapter.setInitialDelayMillis(500);
-        lvTasks.setAdapter(alphaInAnimationAdapter);
+        loadTasks();
 
         // if (findViewById(R.id.taskfragment) != null) {
         // if (savedInstanceState != null) {
@@ -90,6 +86,15 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         // TaskFragment taskFragment = new TaskFragment();
         // fragmentTransaction.add(R.id.taskfragment, taskFragment);
 
+    }
+
+    public void loadTasks () {
+        tasks = getTasksList();
+        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
+        alphaInAnimationAdapter.setAbsListView(lvTasks);
+        alphaInAnimationAdapter.setInitialDelayMillis(500);
+        lvTasks.setAdapter(alphaInAnimationAdapter);
     }
 
     public List<Task> getTasksList() {
@@ -138,6 +143,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
+
+        loadTasks();
     }
 
     public void archiveTask(int taskId) {
