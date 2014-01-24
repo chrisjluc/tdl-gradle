@@ -59,6 +59,14 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
+        // Remember that you should never show the action bar if the
+        // status bar is hidden, so hide that too if necessary.
+        ActionBar actionBar = getActionBar();
+        actionBar.hide();
+
+        // Initialize setup
         setDates();
         setUpActionBar();
         setUpViews();
@@ -309,4 +317,6 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     public void onItemClicked(AbstractWheel wheel, int itemIndex) {
         wheel.setCurrentItem(itemIndex, true);
     }
+
+
 }
