@@ -88,12 +88,16 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
 
     }
 
+   /*
+    *   Load task list
+    */
+
     public void loadTasks () {
         tasks = getTasksList();
         TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
         alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
         alphaInAnimationAdapter.setAbsListView(lvTasks);
-        alphaInAnimationAdapter.setInitialDelayMillis(500);
+        alphaInAnimationAdapter.setInitialDelayMillis(1000);
         lvTasks.setAdapter(alphaInAnimationAdapter);
     }
 
@@ -267,7 +271,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         for (int i = 0; i < DAY_COUNT; i++) {
             TdlDate date = new TdlDate();
             DateFormat format = new SimpleDateFormat("EEEE");
-            date.setDayName(format.format(calendar.getTime()));
+            date.setDayName(format.format(calendar.getTime()).toUpperCase());
             format = new SimpleDateFormat("dd");
             date.setDayNumber(format.format(calendar.getTime()));
             date.setMonth(calendar.get(Calendar.MONTH));

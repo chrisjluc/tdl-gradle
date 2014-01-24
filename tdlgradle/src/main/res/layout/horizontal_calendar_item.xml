@@ -11,7 +11,8 @@
         android:textSize="20sp"
         android:lines="1"
         android:textColor="#777"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-thin"/>
 
     <TextView
         android:id="@+id/tvDayNumber"
@@ -20,5 +21,7 @@
         android:textSize="40sp"
         android:lines="1"
         android:textColor="#777"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-thin"/>
+
 </LinearLayout>
