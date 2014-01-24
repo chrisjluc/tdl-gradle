@@ -20,6 +20,8 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
 	public TaskAdapter(Context context,List<Task> taskList) {
 		super(context, R.layout.task_expandable_list_item, R.id.task_title, R.id.task_content,taskList);
         this.context = context;
+        //Only one item is expanded at a time
+        setLimit(1);
 
 	}
 
