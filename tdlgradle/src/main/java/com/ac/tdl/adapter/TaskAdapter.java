@@ -1,13 +1,18 @@
 package com.ac.tdl.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ac.tdl.EditActivity;
 import com.ac.tdl.R;
 import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
@@ -45,12 +50,23 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
             LayoutInflater vi = LayoutInflater.from(context);
             view = vi.inflate(R.layout.task_content_item, null);
         }
-        Task task = getItem(i);
+        final Task task = getItem(i);
         TextView tvHashtag = (TextView) view.findViewById(R.id.tvHashtag);
         String hashtagString = createHashtagString(task.getHashtagArray());
         tvHashtag.setText(hashtagString);
         TextView tvDetails = (TextView) view.findViewById(R.id.tvDetails);
         tvDetails.setText(task.getTaskDetails());
+
+        ImageButton bEdit = (ImageButton) view.findViewById(R.id.bEdit);
+        bEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EditActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("taskId",task.getTaskId());
+                context.startActivity(intent);
+            }
+        });
         return view;
     }
 
