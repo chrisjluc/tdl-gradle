@@ -5,46 +5,58 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/wrap_scroll"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="horizontal"
-        android:id="@+id/yearMonthLayout"
-        android:layout_alignParentTop="true">
+        android:padding="5dp"
+        android:background="@drawable/layout_task_card">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:paddingTop="20dp"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal"
+            android:id="@+id/yearMonthLayout"
+            android:layout_alignParentTop="true">
+
+            <antistatic.spinnerwheel.WheelHorizontalView
+                android:id="@+id/whvMonth"
+                app:visibleItems="1"
+                app:selectionDividerWidth="1px"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <antistatic.spinnerwheel.WheelHorizontalView
+                android:layout_marginLeft="10dp"
+                android:id="@+id/whvYear"
+                app:visibleItems="1"
+                app:selectionDividerWidth="1px"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <antistatic.spinnerwheel.WheelHorizontalView
-            android:id="@+id/whvMonth"
-            app:visibleItems="1"
+            android:id="@+id/whvCalendar"
+            android:layout_below="@+id/yearMonthLayout"
+            app:visibleItems="7"
             app:selectionDividerWidth="1px"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <antistatic.spinnerwheel.WheelHorizontalView
-            android:layout_marginLeft="10dp"
-            android:id="@+id/whvYear"
-            app:visibleItems="1"
-            app:selectionDividerWidth="1px"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <antistatic.spinnerwheel.WheelHorizontalView
-        android:id="@+id/whvCalendar"
-        android:layout_below="@+id/yearMonthLayout"
-        app:visibleItems="5"
-        app:selectionDividerWidth="1px"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+            android:layout_height="110dp"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/lvTasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/rlAddBar"
-        android:layout_below="@+id/whvCalendar"
-        android:orientation="horizontal"></ListView>
+        android:layout_below="@+id/wrap_scroll"
+        android:orientation="horizontal"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="1dp"
+        ></ListView>
 
     <RelativeLayout
         android:id="@+id/rlAddBar"
