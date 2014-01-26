@@ -223,6 +223,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         bAdd.setOnClickListener(this);
         lvTasks = (ListView) findViewById(R.id.lvTasks);
 
+        TextView header = (TextView) findViewById(R.id.headerTitle);
+        header.setText("DAILY PLANNER");
     }
 
     private void setUpActionBar(){

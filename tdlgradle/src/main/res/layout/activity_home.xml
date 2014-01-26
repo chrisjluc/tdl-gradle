@@ -4,13 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    
+    <RelativeLayout
+        android:id="@+id/header_main"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@android:color/black">
 
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#ffffff"
+            android:textSize="35sp"
+            android:fontFamily="sans-serif-thin"/>
+
+    </RelativeLayout>
+    
     <RelativeLayout
         android:id="@+id/wrap_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/header_main"
         android:padding="5dp"
-        android:background="@drawable/layout_task_card">
+        android:background="@drawable/layout_calendar_card">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -47,16 +65,23 @@
             android:layout_centerInParent="true" />
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/lvTasks"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/rlAddBar"
         android:layout_below="@+id/wrap_scroll"
-        android:orientation="horizontal"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="1dp"
-        ></ListView>
+        android:layout_above="@+id/rlAddBar"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/layout_task_card">
+        <ListView
+            android:id="@+id/lvTasks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:dividerHeight="10dp"
+            android:divider="@color/bg_gray"></ListView>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rlAddBar"

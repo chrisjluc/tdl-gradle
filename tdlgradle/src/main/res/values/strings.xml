@@ -8,4 +8,7 @@
     <string name="title_activity_edit">EditActivity</string>
     <string name="hello_world">Hello world!</string>
 
+    <!-- COLOR REFERENCES -->
+    <color name="bg_gray">#ffcccccc</color>
+
 </resources>
