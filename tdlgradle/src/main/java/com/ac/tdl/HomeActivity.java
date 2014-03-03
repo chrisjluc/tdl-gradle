@@ -42,7 +42,7 @@ import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
 public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener, OnWheelChangedListener {
     // TaskFragment taskfragment;
-    private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBET", "OCTOBER", "NOVEMBER", "DECEMBER"};
+    private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
     private static final int DAY_COUNT = 364;
     private static final int YEAR_COUNT = 4;
     private AbstractWheel dateWheel,monthWheel,yearWheel;

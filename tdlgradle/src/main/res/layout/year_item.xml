@@ -8,11 +8,11 @@
         android:id="@+id/tvSimpleItem"
         android:layout_width="60dp"
         android:layout_height="20dp"
-        android:textSize="20sp"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif-thin"
         android:layout_gravity="center"
         android:lines="1"
-        android:textColor="#000"
-        />
+        android:textColor="#000"/>
 
 
 </LinearLayout>

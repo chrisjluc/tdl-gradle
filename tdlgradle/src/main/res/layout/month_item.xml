@@ -8,9 +8,9 @@
         android:id="@+id/tvSimpleItem"
         android:layout_width="88dp"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:lines="1"
         android:gravity="right"
-        android:textColor="#777"
+        android:textColor="#000"
         android:fontFamily="sans-serif-thin"/>
 </LinearLayout>
