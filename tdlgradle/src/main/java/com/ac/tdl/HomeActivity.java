@@ -60,7 +60,6 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         super.onCreate(savedInstanceState);
 
 
-
         // Remember that you should never show the action bar if the
         // status bar is hidden, so hide that too if necessary.
         ActionBar actionBar = getActionBar();
@@ -73,27 +72,6 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         setUpSpinners();
         setupDatabase();
         loadTasks();
-
-        // if (findViewById(R.id.taskfragment) != null) {
-        // if (savedInstanceState != null) {
-        // return;
-        // }
-        // }
-        //
-        // TaskFragment firstFragment = new TaskFragment();
-        //
-        // firstFragment.setArguments(getIntent().getExtras());
-        //
-        // getSupportFragmentManager().beginTransaction()
-        // .add(R.id.taskfragment, firstFragment).commit();
-        //
-        //
-        // FragmentManager fragmentManager = getSupportFragmentManager();
-        // FragmentTransaction fragmentTransaction =
-        // fragmentManager.beginTransaction();
-        // TaskFragment taskFragment = new TaskFragment();
-        // fragmentTransaction.add(R.id.taskfragment, taskFragment);
-
     }
 
    /*

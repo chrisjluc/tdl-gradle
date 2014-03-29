@@ -53,7 +53,10 @@ public class Task extends Model implements DbContract {
                 SQLiteDatabase db) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
-        this.taskDetails = taskDetails;
+        if (taskDetails == null || taskDetails.isEmpty())
+            this.taskDetails = "";
+        else
+            this.taskDetails = taskDetails;
         this.priority = priority;
         this.dateCreated = dateCreated;
         this.dateReminder = dateReminder;
@@ -262,20 +265,16 @@ public class Task extends Model implements DbContract {
         while (matcher.find()) {
             String match = matcher.group(1);
             //Don't want numbers to be valid hashtags
-            if(!isNumber(match))
+            if (!isNumber(match))
                 hashtagList.add(match);
         }
         return hashtagList;
     }
 
-    public static boolean isNumber(String str)
-    {
-        try
-        {
+    public static boolean isNumber(String str) {
+        try {
             double d = Double.parseDouble(str);
-        }
-        catch(NumberFormatException nfe)
-        {
+        } catch (NumberFormatException nfe) {
             return false;
         }
         return true;

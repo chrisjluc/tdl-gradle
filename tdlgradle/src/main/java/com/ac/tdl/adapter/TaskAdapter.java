@@ -52,7 +52,7 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
         }
         final Task task = getItem(i);
         TextView tvHashtag = (TextView) view.findViewById(R.id.tvHashtag);
-        String hashtagString = createHashtagString(task.getHashtagArray());
+        String hashtagString = Hashtag.createHashtagString(task.getHashtagArray());
         tvHashtag.setText(hashtagString);
         TextView tvDetails = (TextView) view.findViewById(R.id.tvDetails);
         tvDetails.setText(task.getTaskDetails());
@@ -68,19 +68,6 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
             }
         });
         return view;
-    }
-
-    private String createHashtagString(Hashtag[] array){
-        StringBuilder hashtagBuilder = new StringBuilder();
-
-        if (array == null) {
-            return "";
-        }
-
-        for (Hashtag hashtag : array){
-            hashtagBuilder.append(" #" + hashtag.getLabel());
-        }
-        return hashtagBuilder.toString();
     }
 
 }

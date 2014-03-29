@@ -69,6 +69,18 @@ public class Hashtag extends Model implements DbContract {
 			Log.d("Exception", e.toString());
 		}
 	}
+   public static String createHashtagString(Hashtag[] array){
+            StringBuilder hashtagBuilder = new StringBuilder();
+
+            if (array == null) {
+                return "";
+            }
+
+            for (Hashtag hashtag : array){
+                hashtagBuilder.append(" #" + hashtag.getLabel());
+            }
+            return hashtagBuilder.toString();
+        }
 
 	@Override
 	public void setModelInDb() {
