@@ -251,6 +251,7 @@ public class Task extends Model implements DbContract {
         String selection = TaskTable.COLUMN_NAME_ID + "=? ";
         String[] selectionArgs = {String.valueOf(taskId)};
         db.update(TaskTable.TABLE_NAME, taskValues, selection, selectionArgs);
+        updateHashtagIfChanged();
     }
 
     /**

@@ -190,15 +190,20 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
 
 
     private void showEditTextDialog(int flag){
-        final EditText input = new EditText(this);
+        final EditText etInput = new EditText(this);
         if(flag == TASK_TITLE_DIALOG) {
+            etInput.setText(task.getTaskTitle());
             new AlertDialog.Builder(this)
                     .setTitle("Update Task")
                     .setMessage("")
-                    .setView(input)
+                    .setView(etInput)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            input.getText();
+                            String input = etInput.getText().toString();
+                            task.setTaskTitle(input);
+                            tvTaskTitle.setText(input);
+                            String hashtags = Hashtag.createHashtagString(task.getHashtagsLabelsFromUpdatedFields());
+                            tvHashtags.setText(hashtags);
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -206,13 +211,17 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 }
             }).show();
         }else{
+            etInput.setText(task.getTaskDetails());
             new AlertDialog.Builder(this)
                     .setTitle("Update details")
                     .setMessage("")
-                    .setView(input)
+                    .setView(etInput)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            input.getText();
+                            String input = etInput.getText().toString();
+                            task.setTaskDetails(input);
+                            tvTaskDetail.setText(input);
+                            tvHashtags.setText(Hashtag.createHashtagString(task.getHashtagsLabelsFromUpdatedFields()));
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
