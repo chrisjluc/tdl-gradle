@@ -230,6 +230,29 @@ public class Task extends Model implements DbContract {
         taskId = (int) db.insert(TaskTable.TABLE_NAME, null, taskValues);
     }
 
+    public void updateModelInDb() {
+        if (dateCreated == 0) {
+            dateCreated = getCurrentTime();
+        }
+        ContentValues taskValues = new ContentValues();
+        taskValues.put(TaskTable.COLUMN_NAME_TITLE, taskTitle);
+        taskValues.put(TaskTable.COLUMN_NAME_DETAILS, taskDetails);
+        taskValues
+                .put(TaskTable.COLUMN_NAME_PRIORITY, getIntFromBool(priority));
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_CREATED, dateCreated);
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_REMINDER, dateReminder);
+        taskValues.put(TaskTable.COLUMN_NAME_REPETITION_MS, repetitionInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS,
+                notifyBeforeReminderInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_IS_COMPLETE,
+                getIntFromBool(isComplete));
+        taskValues
+                .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
+        String selection = TaskTable.COLUMN_NAME_ID + "=? ";
+        String[] selectionArgs = {String.valueOf(taskId)};
+        db.update(TaskTable.TABLE_NAME, taskValues, selection, selectionArgs);
+    }
+
     /**
      * Updates the specified column with a value (value only supports String and
      * int)

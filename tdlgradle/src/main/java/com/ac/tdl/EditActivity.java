@@ -1,24 +1,36 @@
 package com.ac.tdl;
 
-import android.app.Activity;
-
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 
-public class EditActivity extends Activity implements View.OnClickListener{
+import java.util.Calendar;
+
+public class EditActivity extends FragmentActivity implements View.OnClickListener {
+    public final static int TASK_TITLE_DIALOG = 0;
+    public final static int TASK_DETAIL_DIALOG = 1;
     private Task task;
     private SQLiteDatabase db;
     private TextView tvTaskTitle;
@@ -26,17 +38,18 @@ public class EditActivity extends Activity implements View.OnClickListener{
     private TextView tvHashtags;
     private CheckBox cbPriority;
     private TextView tvDate;
-    private LinearLayout llReminder;
+    private TextView tvTime;
     private Button bCancel;
     private Button bSave;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         setupDatabase();
         Intent intent = getIntent();
-        if(intent != null){
-            int taskId = intent.getIntExtra("taskId",0);
+        if (intent != null) {
+            int taskId = intent.getIntExtra("taskId", 0);
             task = new TaskBuilder().withDb(db).withTaskId(taskId).build();
             task.getModelFromDb();
         }
@@ -60,9 +73,10 @@ public class EditActivity extends Activity implements View.OnClickListener{
         cbPriority.setChecked(task.isPriority());
 
         tvDate = (TextView) findViewById(R.id.tvEditReminderDate);
+        tvDate.setOnClickListener(this);
 
-        llReminder = (LinearLayout) findViewById(R.id.llReminder);
-        llReminder.setOnClickListener(this);
+        tvTime = (TextView) findViewById(R.id.tvEditReminderTime);
+        tvTime.setOnClickListener(this);
 
         bCancel = (Button) findViewById(R.id.bEditCancel);
         bCancel.setOnClickListener(this);
@@ -80,7 +94,7 @@ public class EditActivity extends Activity implements View.OnClickListener{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.edit, menu);
         return true;
@@ -100,20 +114,111 @@ public class EditActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tvEditTaskTitle:
+                showEditTextDialog(TASK_TITLE_DIALOG);
                 break;
             case R.id.tvEditTaskDetail:
+                showEditTextDialog(TASK_DETAIL_DIALOG);
                 break;
-            case R.id.llReminder:
+            case R.id.tvEditReminderDate:
+                showDatePickerDialog();
+                break;
+            case R.id.tvEditReminderTime:
+                showTimePickerDialog();
                 break;
             case R.id.bEditCancel:
                 finish();
                 break;
             case R.id.bEditSave:
-                task.saveModel();
+                task.setPriority(cbPriority.isChecked());
+                task.updateModelInDb();
                 finish();
                 break;
+        }
+    }
+
+    public void showDatePickerDialog() {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    public void showTimePickerDialog() {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
+        }
+    }
+
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+        }
+    }
+
+
+    private void showEditTextDialog(int flag){
+        final EditText input = new EditText(this);
+        if(flag == TASK_TITLE_DIALOG) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Update Task")
+                    .setMessage("")
+                    .setView(input)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            input.getText();
+                        }
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Do nothing.
+                }
+            }).show();
+        }else{
+            new AlertDialog.Builder(this)
+                    .setTitle("Update details")
+                    .setMessage("")
+                    .setView(input)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            input.getText();
+                        }
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Do nothing.
+                }
+            }).show();
         }
     }
 }

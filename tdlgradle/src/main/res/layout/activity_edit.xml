@@ -6,7 +6,7 @@
 
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="task title"
         android:id="@+id/tvEditTaskTitle"
@@ -15,7 +15,7 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Task details"
         android:id="@+id/tvEditTaskDetail"
@@ -24,7 +24,7 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="hashtags"
         android:id="@+id/tvEditHashtags"
@@ -73,6 +73,11 @@
             android:layout_height="wrap_content"
             android:text="date"
             android:id="@+id/tvEditReminderDate"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="time"
+            android:id="@+id/tvEditReminderTime"/>
         </LinearLayout>
 
 
