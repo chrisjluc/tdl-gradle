@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -25,7 +26,9 @@ import com.ac.tdl.adapter.TaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 import com.ac.tdl.model.TdlDate;
+import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -53,7 +56,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     List<TdlDate> dates;
     List<String> years;
     ListView lvTasks;
-    AlphaInAnimationAdapter alphaInAnimationAdapter;
+    ScaleInAnimationAdapter scaleInAnimationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +84,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     public void loadTasks () {
         tasks = getTasksList();
         TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-        alphaInAnimationAdapter = new AlphaInAnimationAdapter(taskAdapter);
-        alphaInAnimationAdapter.setAbsListView(lvTasks);
-        alphaInAnimationAdapter.setInitialDelayMillis(1000);
-        lvTasks.setAdapter(alphaInAnimationAdapter);
+        scaleInAnimationAdapter = new ScaleInAnimationAdapter(taskAdapter);
+        scaleInAnimationAdapter.setAbsListView(lvTasks);
+        scaleInAnimationAdapter.setInitialDelayMillis(0);
+        lvTasks.setAdapter(scaleInAnimationAdapter);
     }
 
     public List<Task> getTasksList() {
@@ -129,7 +132,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
                 .build();
         task.saveModel();
         tasks.add(0, task);
-        alphaInAnimationAdapter.notifyDataSetChanged();
+        scaleInAnimationAdapter.notifyDataSetChanged();
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
