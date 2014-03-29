@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.ac.tdl.SQL.DbContract;
 
+import java.util.List;
+
 public class Hashtag extends Model implements DbContract {
 
 	private int hashtagId;
@@ -81,6 +83,18 @@ public class Hashtag extends Model implements DbContract {
             }
             return hashtagBuilder.toString();
         }
+    public static String createHashtagString(List<String> array){
+        StringBuilder hashtagBuilder = new StringBuilder();
+
+        if (array == null) {
+            return "";
+        }
+
+        for (String s: array){
+            hashtagBuilder.append(" #" + s);
+        }
+        return hashtagBuilder.toString();
+    }
 
 	@Override
 	public void setModelInDb() {
