@@ -43,8 +43,37 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     private Button bCancel;
     private Button bSave;
     private Calendar calendar;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd, yyyy");
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private DialogListener dl = new DialogListener(){
+
+        @Override
+        public void onDateChosen(int nYear, int nMonth, int nDay) {
+            if(calendar == null){
+                calendar = Calendar.getInstance();
+            }
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            calendar.add(Calendar.YEAR,nYear-year);
+            calendar.add(Calendar.MONTH,nMonth-month);
+            calendar.add(Calendar.DAY_OF_YEAR,nDay-day);
+            tvDate.setText(dateFormat.format(calendar.getTime()));
+        }
+
+        @Override
+        public void onTimeChosen(int nHour, int nMinute) {
+            if(calendar == null){
+                calendar = Calendar.getInstance();
+            }
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            calendar.add(Calendar.HOUR_OF_DAY,nHour-hour);
+            calendar.add(Calendar.MINUTE,nMinute-minute);
+            tvTime.setText(timeFormat.format(calendar.getTime()));
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +175,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.bEditSave:
                 task.setPriority(cbPriority.isChecked());
+                task.setDateReminder(calendar.getTimeInMillis());
                 task.updateModelInDb();
                 finish();
                 break;
@@ -153,28 +183,31 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     }
 
     public void showDatePickerDialog() {
-        DialogFragment newFragment = new DatePickerFragment(calendar);
+        DialogFragment newFragment = new DatePickerFragment(calendar,dl);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
     public void showTimePickerDialog() {
-        DialogFragment newFragment = new TimePickerFragment(calendar);
+        DialogFragment newFragment = new TimePickerFragment(calendar,dl);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
         private Calendar calendar;
-        int year = 0;
-        int month = 0;
-        int day = 0;
-        DatePickerFragment(Calendar calendar){
+        private DialogListener dl;
+        DatePickerFragment(Calendar calendar,DialogListener dl){
             this.calendar = calendar;
+            this.dl = dl;
         }
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Calendar c = Calendar.getInstance();
+            int year = 0;
+            int month = 0;
+            int day = 0;
+
             if(calendar == null){
+                Calendar c = Calendar.getInstance();
                 year = c.get(Calendar.YEAR);
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
@@ -189,18 +222,32 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         }
 
         public void onDateSet(DatePicker view, int nYear, int nMonth, int nDay) {
+            dl.onDateChosen(nYear,nMonth,nDay);
         }
     }
 
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
+        private Calendar calendar;
+        private DialogListener dl;
+        TimePickerFragment(Calendar calendar,DialogListener dl){
+            this.calendar = calendar;
+            this.dl = dl;
+        }
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            int hour = 0;
+            int minute = 0;
+
+            if(calendar == null) {
+                Calendar c = Calendar.getInstance();
+                hour = c.get(Calendar.HOUR_OF_DAY);
+                minute = c.get(Calendar.MINUTE);
+            }else{
+                hour = calendar.get(Calendar.HOUR_OF_DAY);
+                minute = calendar.get(Calendar.MINUTE);
+            }
 
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
@@ -208,7 +255,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
+            dl.onTimeChosen(hourOfDay,minute);
         }
     }
 

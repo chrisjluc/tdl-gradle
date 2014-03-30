@@ -327,7 +327,10 @@ public class Task extends Model implements DbContract {
     }
 
     private boolean doesValueExistInHashtagList(String value) {
-        for (Hashtag oldHashtag : getHashtagArray()) {
+        Hashtag[] array = getHashtagArray();
+        if(array == null)
+            return false;
+        for (Hashtag oldHashtag : array) {
             if (oldHashtag.getLabel().equals(value)) {
                 return true;
             }
