@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ac.tdl.EditActivity;
+import com.ac.tdl.EditActivityListener;
 import com.ac.tdl.R;
 import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
@@ -22,9 +23,11 @@ import java.util.List;
 
 public class TaskAdapter extends ExpandableListItemAdapter<Task> {
     private Context context;
-	public TaskAdapter(Context context,List<Task> taskList) {
+    private EditActivityListener editActivityListener;
+	public TaskAdapter(Context context,List<Task> taskList,EditActivityListener editActivityListener) {
 		super(context, R.layout.task_expandable_list_item, R.id.task_title, R.id.task_content,taskList);
         this.context = context;
+        this.editActivityListener = editActivityListener;
         //Only one item is expanded at a time
         setLimit(1);
 
@@ -61,10 +64,7 @@ public class TaskAdapter extends ExpandableListItemAdapter<Task> {
         bEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, EditActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("taskId",task.getTaskId());
-                context.startActivity(intent);
+                editActivityListener.startActivityFromHomeActivity(task.getTaskId());
             }
         });
         return view;

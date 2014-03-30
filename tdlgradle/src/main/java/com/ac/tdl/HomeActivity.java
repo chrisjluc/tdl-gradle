@@ -1,6 +1,7 @@
 package com.ac.tdl;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -26,8 +26,6 @@ import com.ac.tdl.adapter.TaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 import com.ac.tdl.model.TdlDate;
-import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 
 import java.text.DateFormat;
@@ -44,19 +42,29 @@ import antistatic.spinnerwheel.OnWheelClickedListener;
 import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
 public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener, OnWheelChangedListener {
-    // TaskFragment taskfragment;
+    private static final int EDIT_ACTIVITY = 1;
     private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
     private static final int DAY_COUNT = 364;
     private static final int YEAR_COUNT = 4;
-    private AbstractWheel dateWheel,monthWheel,yearWheel;
-    EditText etTaskTitle;
-    ImageButton bAdd;
-    SQLiteDatabase db;
-    List<Task> tasks;
-    List<TdlDate> dates;
-    List<String> years;
-    ListView lvTasks;
-    ScaleInAnimationAdapter scaleInAnimationAdapter;
+    private AbstractWheel dateWheel, monthWheel, yearWheel;
+    private EditText etTaskTitle;
+    private ImageButton bAdd;
+    private SQLiteDatabase db;
+    private List<Task> tasks;
+    private List<TdlDate> dates;
+    private List<String> years;
+    private ListView lvTasks;
+    private ScaleInAnimationAdapter scaleInAnimationAdapter;
+    private EditActivityListener editActivityListener = new EditActivityListener() {
+
+        @Override
+        public void startActivityFromHomeActivity(int i) {
+            Intent intent = new Intent(getApplicationContext(), EditActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("taskId",i);
+            startActivityForResult(intent,EDIT_ACTIVITY);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +88,18 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
    /*
     *   Load task list
     */
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+       if (requestCode == EDIT_ACTIVITY)
+           if(resultCode == RESULT_OK) {
+               boolean result = data.getBooleanExtra("isSaved", false);
+               if(result)
+                   loadTasks();
+           }
+   }
 
-    public void loadTasks () {
+    public void loadTasks() {
         tasks = getTasksList();
-        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks, editActivityListener);
         scaleInAnimationAdapter = new ScaleInAnimationAdapter(taskAdapter);
         scaleInAnimationAdapter.setAbsListView(lvTasks);
         scaleInAnimationAdapter.setInitialDelayMillis(0);
@@ -208,7 +224,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         header.setText("DAILY PLANNER");
     }
 
-    private void setUpActionBar(){
+    private void setUpActionBar() {
         ActionBar ab = getActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
@@ -229,15 +245,15 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         monthAdapter.setItemResource(R.layout.month_item);
         monthAdapter.setItemTextResource(R.id.tvSimpleItem);
         monthWheel.setViewAdapter(monthAdapter);
-        monthWheel.setCurrentItem(dates.get(DAY_COUNT/2).getMonth());
+        monthWheel.setCurrentItem(dates.get(DAY_COUNT / 2).getMonth());
         monthWheel.setCyclic(true);
         monthWheel.setEnabled(false);
 
         yearWheel = (AbstractWheel) findViewById(R.id.whvYear);
         int currentYear = Calendar.getInstance(Locale.CANADA).get(Calendar.YEAR);
         String[] years = new String[YEAR_COUNT];
-        for(int i = 0; i < YEAR_COUNT; i++){
-            years[i] = Integer.toString(currentYear - YEAR_COUNT/2 + i);
+        for (int i = 0; i < YEAR_COUNT; i++) {
+            years[i] = Integer.toString(currentYear - YEAR_COUNT / 2 + i);
         }
         this.years = Arrays.asList(years);
         ArrayWheelAdapter<String> yearAdapter =
@@ -245,7 +261,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         yearAdapter.setItemResource(R.layout.year_item);
         yearAdapter.setItemTextResource(R.id.tvSimpleItem);
         yearWheel.setViewAdapter(yearAdapter);
-        yearWheel.setCurrentItem(YEAR_COUNT/2);
+        yearWheel.setCurrentItem(YEAR_COUNT / 2);
         yearWheel.setEnabled(false);
     }
 
@@ -283,15 +299,15 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     @Override
     public void onChanged(AbstractWheel wheel, int oldValue, int newValue) {
         switch (wheel.getId()) {
-            case R.id.whvCalendar :
+            case R.id.whvCalendar:
                 TdlDate date = dates.get(newValue);
-                monthWheel.setCurrentItem(date.getMonth(),true);
+                monthWheel.setCurrentItem(date.getMonth(), true);
                 int index = years.indexOf(Integer.toString(date.getYear()));
-                yearWheel.setCurrentItem(index,true);
+                yearWheel.setCurrentItem(index, true);
                 break;
-            case R.id.whvMonth :
+            case R.id.whvMonth:
                 break;
-            case R.id.whvYear :
+            case R.id.whvYear:
                 break;
         }
     }

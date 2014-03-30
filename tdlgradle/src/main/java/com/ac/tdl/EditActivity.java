@@ -171,12 +171,18 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 showTimePickerDialog();
                 break;
             case R.id.bEditCancel:
+                Intent cancelIntent = new Intent();
+                setResult(RESULT_CANCELED, cancelIntent);
                 finish();
                 break;
             case R.id.bEditSave:
                 task.setPriority(cbPriority.isChecked());
-                task.setDateReminder(calendar.getTimeInMillis());
+                if(calendar != null)
+                    task.setDateReminder(calendar.getTimeInMillis());
                 task.updateModelInDb();
+                Intent saveIntent = new Intent();
+                saveIntent.putExtra("isSaved",true);
+                setResult(RESULT_OK,saveIntent);
                 finish();
                 break;
         }
