@@ -45,31 +45,31 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     private Calendar calendar;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd, yyyy");
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    private DialogListener dl = new DialogListener(){
+    private DialogListener dl = new DialogListener() {
 
         @Override
         public void onDateChosen(int nYear, int nMonth, int nDay) {
-            if(calendar == null){
+            if (calendar == null) {
                 calendar = Calendar.getInstance();
             }
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
             int day = calendar.get(Calendar.DAY_OF_MONTH);
-            calendar.add(Calendar.YEAR,nYear-year);
-            calendar.add(Calendar.MONTH,nMonth-month);
-            calendar.add(Calendar.DAY_OF_YEAR,nDay-day);
+            calendar.add(Calendar.YEAR, nYear - year);
+            calendar.add(Calendar.MONTH, nMonth - month);
+            calendar.add(Calendar.DAY_OF_YEAR, nDay - day);
             tvDate.setText(dateFormat.format(calendar.getTime()));
         }
 
         @Override
         public void onTimeChosen(int nHour, int nMinute) {
-            if(calendar == null){
+            if (calendar == null) {
                 calendar = Calendar.getInstance();
             }
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
-            calendar.add(Calendar.HOUR_OF_DAY,nHour-hour);
-            calendar.add(Calendar.MINUTE,nMinute-minute);
+            calendar.add(Calendar.HOUR_OF_DAY, nHour - hour);
+            calendar.add(Calendar.MINUTE, nMinute - minute);
             tvTime.setText(timeFormat.format(calendar.getTime()));
         }
     };
@@ -112,9 +112,9 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         tvTime.setOnClickListener(this);
 
         //if no date reminder
-        if(task.getDateReminder() == 0){
+        if (task.getDateReminder() == 0) {
             tvDate.setText("No Completion date set");
-        }else{
+        } else {
             calendar = Calendar.getInstance();
             calendar.setTimeInMillis(task.getDateReminder());
             tvDate.setText(dateFormat.format(calendar.getTime()));
@@ -183,12 +183,12 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     }
 
     public void showDatePickerDialog() {
-        DialogFragment newFragment = new DatePickerFragment(calendar,dl);
+        DialogFragment newFragment = new DatePickerFragment(calendar, dl);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
     public void showTimePickerDialog() {
-        DialogFragment newFragment = new TimePickerFragment(calendar,dl);
+        DialogFragment newFragment = new TimePickerFragment(calendar, dl);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
@@ -196,33 +196,34 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
             implements DatePickerDialog.OnDateSetListener {
         private Calendar calendar;
         private DialogListener dl;
-        DatePickerFragment(Calendar calendar,DialogListener dl){
+
+        DatePickerFragment(Calendar calendar, DialogListener dl) {
             this.calendar = calendar;
             this.dl = dl;
         }
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int year = 0;
             int month = 0;
             int day = 0;
 
-            if(calendar == null){
+            if (calendar == null) {
                 Calendar c = Calendar.getInstance();
                 year = c.get(Calendar.YEAR);
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
-            }else{
+            } else {
                 year = calendar.get(Calendar.YEAR);
                 month = calendar.get(Calendar.MONTH);
                 day = calendar.get(Calendar.DAY_OF_MONTH);
             }
 
-            // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int nYear, int nMonth, int nDay) {
-            dl.onDateChosen(nYear,nMonth,nDay);
+            dl.onDateChosen(nYear, nMonth, nDay);
         }
     }
 
@@ -231,20 +232,22 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
 
         private Calendar calendar;
         private DialogListener dl;
-        TimePickerFragment(Calendar calendar,DialogListener dl){
+
+        TimePickerFragment(Calendar calendar, DialogListener dl) {
             this.calendar = calendar;
             this.dl = dl;
         }
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int hour = 0;
             int minute = 0;
 
-            if(calendar == null) {
+            if (calendar == null) {
                 Calendar c = Calendar.getInstance();
                 hour = c.get(Calendar.HOUR_OF_DAY);
                 minute = c.get(Calendar.MINUTE);
-            }else{
+            } else {
                 hour = calendar.get(Calendar.HOUR_OF_DAY);
                 minute = calendar.get(Calendar.MINUTE);
             }
@@ -255,14 +258,14 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            dl.onTimeChosen(hourOfDay,minute);
+            dl.onTimeChosen(hourOfDay, minute);
         }
     }
 
 
-    private void showEditTextDialog(int flag){
+    private void showEditTextDialog(int flag) {
         final EditText etInput = new EditText(this);
-        if(flag == TASK_TITLE_DIALOG) {
+        if (flag == TASK_TITLE_DIALOG) {
             etInput.setText(task.getTaskTitle());
             new AlertDialog.Builder(this)
                     .setTitle("Update Task")
@@ -278,10 +281,9 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    // Do nothing.
                 }
             }).show();
-        }else{
+        } else {
             etInput.setText(task.getTaskDetails());
             new AlertDialog.Builder(this)
                     .setTitle("Update details")
@@ -296,7 +298,6 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    // Do nothing.
                 }
             }).show();
         }
