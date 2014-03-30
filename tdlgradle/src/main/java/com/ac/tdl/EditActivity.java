@@ -26,6 +26,7 @@ import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class EditActivity extends FragmentActivity implements View.OnClickListener {
@@ -41,7 +42,9 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     private TextView tvTime;
     private Button bCancel;
     private Button bSave;
-
+    private Calendar calendar;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,11 +75,22 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         cbPriority = (CheckBox) findViewById(R.id.cbEditPriority);
         cbPriority.setChecked(task.isPriority());
 
+
         tvDate = (TextView) findViewById(R.id.tvEditReminderDate);
         tvDate.setOnClickListener(this);
 
         tvTime = (TextView) findViewById(R.id.tvEditReminderTime);
         tvTime.setOnClickListener(this);
+
+        //if no date reminder
+        if(task.getDateReminder() == 0){
+            tvDate.setText("No Completion date set");
+        }else{
+            calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(task.getDateReminder());
+            tvDate.setText(dateFormat.format(calendar.getTime()));
+            tvTime.setText(timeFormat.format(calendar.getTime()));
+        }
 
         bCancel = (Button) findViewById(R.id.bEditCancel);
         bCancel.setOnClickListener(this);
@@ -139,32 +153,42 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     }
 
     public void showDatePickerDialog() {
-        DialogFragment newFragment = new DatePickerFragment();
+        DialogFragment newFragment = new DatePickerFragment(calendar);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
     public void showTimePickerDialog() {
-        DialogFragment newFragment = new TimePickerFragment();
+        DialogFragment newFragment = new TimePickerFragment(calendar);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
-
+        private Calendar calendar;
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        DatePickerFragment(Calendar calendar){
+            this.calendar = calendar;
+        }
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
+            Calendar c = Calendar.getInstance();
+            if(calendar == null){
+                year = c.get(Calendar.YEAR);
+                month = c.get(Calendar.MONTH);
+                day = c.get(Calendar.DAY_OF_MONTH);
+            }else{
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+            }
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
+        public void onDateSet(DatePicker view, int nYear, int nMonth, int nDay) {
         }
     }
 
