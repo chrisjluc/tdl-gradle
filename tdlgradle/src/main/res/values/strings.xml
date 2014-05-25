@@ -11,4 +11,22 @@
     <!-- COLOR REFERENCES -->
     <color name="bg_gray">#ffcccccc</color>
 
+    <!-- NAV DRAWER MENU ITEMS -->
+    <string-array name="nav_drawer_items">
+        <item >Daily Planner</item>
+        <item >Hashtags</item>
+        <item >Settings</item>
+    </string-array>
+
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_dailyplanner</item>
+        <item>@drawable/ic_hashtags</item>
+        <item>@drawable/ic_settings</item>
+    </array>
+
+    <!-- Content Description -->
+
+
 </resources>
