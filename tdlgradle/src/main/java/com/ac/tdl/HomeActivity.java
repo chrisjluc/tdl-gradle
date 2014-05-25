@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,8 +62,8 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         public void startActivityFromHomeActivity(int i) {
             Intent intent = new Intent(getApplicationContext(), EditActivity.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("taskId",i);
-            startActivityForResult(intent,EDIT_ACTIVITY);
+            intent.putExtra("taskId", i);
+            startActivityForResult(intent, EDIT_ACTIVITY);
         }
     };
 
@@ -85,17 +86,17 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         loadTasks();
     }
 
-   /*
-    *   Load task list
-    */
-   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       if (requestCode == EDIT_ACTIVITY)
-           if(resultCode == RESULT_OK) {
-               boolean result = data.getBooleanExtra("isSaved", false);
-               if(result)
-                   loadTasks();
-           }
-   }
+    /*
+     *   Load task list
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_ACTIVITY)
+            if (resultCode == RESULT_OK) {
+                boolean result = data.getBooleanExtra("isSaved", false);
+                if (result)
+                    loadTasks();
+            }
+    }
 
     public void loadTasks() {
         tasks = getTasksList();
@@ -106,22 +107,66 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         lvTasks.setAdapter(scaleInAnimationAdapter);
     }
 
+    /**
+     * From Earliest task to latest task
+     * tasks with no reminder date will always be the first under 'today' section
+     *
+     * @return tasksList
+     */
     public List<Task> getTasksList() {
         Cursor cursor = getUnarchivedTaskIds();
-        List<Task> taskList = new ArrayList<Task>();
+        List<Task> orderedTaskList = new ArrayList<Task>();
+        List<Task> emptyReminderTaskList = new ArrayList<Task>();
         while (cursor.moveToNext()) {
             Task t = new TaskBuilder().withDb(db).build();
             t.setTaskId(cursor.getInt(cursor
                     .getColumnIndexOrThrow(TaskTable.COLUMN_NAME_ID)));
             t.getModelFromDb();
-            taskList.add(t);
+
+            if (t.getDateReminder() == 0)
+                emptyReminderTaskList.add(t);
+            else
+                orderedTaskList.add(t);
         }
-        return taskList;
+        if (emptyReminderTaskList.size() > 0) {
+            return mergeListsOnReminderDate(orderedTaskList, emptyReminderTaskList);
+        }
+        return orderedTaskList;
+    }
+
+    private List<Task> mergeListsOnReminderDate(List<Task> orderedTaskList, List<Task> emptyReminderTaskList) {
+        List<Task> mergedTaskList = new ArrayList<Task>();
+        int index = 0;
+
+        //12:00 am of currentday
+        long currentDayTimestamp = getCurrentDate();
+
+        for(Task orderedTask : orderedTaskList){
+
+            //Ordered tasks at 12:00 am on current date will appear after empty reminders
+            if(orderedTask.getDateReminder() >= currentDayTimestamp) {
+                mergedTaskList.addAll(emptyReminderTaskList);
+                break;
+            }
+            mergedTaskList.add(orderedTask);
+            index++;
+        }
+        mergedTaskList.addAll(orderedTaskList.subList(index,orderedTaskList.size()));
+        return mergedTaskList;
+    }
+
+    private long getCurrentDate() {
+        Calendar c = new GregorianCalendar();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND,0);
+        return c.getTime().getTime();
     }
 
     private Cursor getUnarchivedTaskIds() {
         String[] projection = {TaskTable.COLUMN_NAME_ID};
-        String sortOrder = TaskTable.COLUMN_NAME_ID + " DESC";
+        String sortOrder = TaskTable.COLUMN_NAME_DATE_REMINDER + " ASC";
         String selection = TaskTable.COLUMN_NAME_ARCHIVED + "=? ";
         String[] selectionArgs = {"0"};
         Cursor cursor = db.query(TaskTable.TABLE_NAME, projection, selection,
