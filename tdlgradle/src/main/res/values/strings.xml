@@ -7,9 +7,22 @@
     <string name="calendarview">Calender View</string>
     <string name="title_activity_edit">EditActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
 
     <!-- COLOR REFERENCES -->
     <color name="bg_gray">#ffcccccc</color>
+
+    <color name="list_divider">#ffffff</color>
+    <color name="list_selector">#00abd7</color>
+    <color name="list_background">#666666</color>
+
+    <color name="list_item_title">#23dda2</color>
+    <color name="counter_text_color">#000000</color>
+    <color name="counter_text_bg">#e67e22</color>
+    <color name="list_background_pressed">#f1c40f</color>
+
+
 
     <!-- NAV DRAWER MENU ITEMS -->
     <string-array name="nav_drawer_items">
@@ -18,15 +31,13 @@
         <item >Settings</item>
     </string-array>
 
-    <!-- Nav Drawer List Item Icons -->
-    <!-- Keep them in order as the titles are in -->
+    <!-- NAV DRAWER LIST ITEM ICONS -->
     <array name="nav_drawer_icons">
         <item>@drawable/ic_dailyplanner</item>
         <item>@drawable/ic_hashtags</item>
         <item>@drawable/ic_settings</item>
     </array>
 
-    <!-- Content Description -->
-
+       <string name='desc_list_item_icon'>DICKS</string>
 
 </resources>
