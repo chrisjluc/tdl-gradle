@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -26,7 +27,7 @@ import com.ac.tdl.adapter.TaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 import com.ac.tdl.model.TdlDate;
-import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,7 +43,9 @@ import antistatic.spinnerwheel.OnWheelChangedListener;
 import antistatic.spinnerwheel.OnWheelClickedListener;
 import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
-public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener, OnWheelChangedListener {
+public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener,
+        OnWheelChangedListener, ContextualUndoAdapter.DeleteItemCallback {
+
     private static final int EDIT_ACTIVITY = 1;
     private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
     private static final int DAY_COUNT = 364;
@@ -55,7 +58,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     private List<TdlDate> dates;
     private List<String> years;
     private ListView lvTasks;
-    private ScaleInAnimationAdapter scaleInAnimationAdapter;
+    private TaskAdapter taskAdapter;
     private EditActivityListener editActivityListener = new EditActivityListener() {
 
         @Override
@@ -100,11 +103,25 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
 
     public void loadTasks() {
         tasks = getTasksList();
-        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks, editActivityListener);
-        scaleInAnimationAdapter = new ScaleInAnimationAdapter(taskAdapter);
-        scaleInAnimationAdapter.setAbsListView(lvTasks);
-        scaleInAnimationAdapter.setInitialDelayMillis(0);
-        lvTasks.setAdapter(scaleInAnimationAdapter);
+        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter, R.layout.undo_row, R.id.undo_row_undobutton, this);
+        adapter.setAbsListView(lvTasks);
+        lvTasks.setAdapter(adapter);
+        lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editActivityListener.startActivityFromHomeActivity(tasks.get(position).getTaskId());
+            }
+        });
+     }
+
+    @Override
+    public void deleteItem(final int position) {
+        Task task = tasks.get(position);
+        taskAdapter.remove(task);
+        taskAdapter.notifyDataSetChanged();
+        task.updateArchived(true);
     }
 
     /**
@@ -141,17 +158,17 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         //12:00 am of currentday
         long currentDayTimestamp = getCurrentDate();
 
-        for(Task orderedTask : orderedTaskList){
+        for (Task orderedTask : orderedTaskList) {
 
             //Ordered tasks at 12:00 am on current date will appear after empty reminders
-            if(orderedTask.getDateReminder() >= currentDayTimestamp) {
+            if (orderedTask.getDateReminder() >= currentDayTimestamp) {
                 mergedTaskList.addAll(emptyReminderTaskList);
                 break;
             }
             mergedTaskList.add(orderedTask);
             index++;
         }
-        mergedTaskList.addAll(orderedTaskList.subList(index,orderedTaskList.size()));
+        mergedTaskList.addAll(orderedTaskList.subList(index, orderedTaskList.size()));
         return mergedTaskList;
     }
 
@@ -160,7 +177,7 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND,0);
+        c.set(Calendar.MILLISECOND, 0);
         return c.getTime().getTime();
     }
 
@@ -192,21 +209,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
                 .withDb(db)
                 .build();
         task.saveModel();
-        tasks.add(0, task);
-        scaleInAnimationAdapter.notifyDataSetChanged();
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
 
         loadTasks();
-    }
-
-    public void archiveTask(int taskId) {
-        Task task = new TaskBuilder()
-                .withTaskId(taskId)
-                .withDb(db)
-                .build();
-        task.updateArchived(true);
     }
 
     /**
