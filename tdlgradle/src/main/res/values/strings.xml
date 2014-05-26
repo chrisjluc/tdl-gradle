@@ -15,7 +15,7 @@
 
     <color name="list_divider">#ffffff</color>
     <color name="list_selector">#00abd7</color>
-    <color name="list_background">#666666</color>
+    <color name="list_background">#2c3e50</color>
 
     <color name="list_item_title">#23dda2</color>
     <color name="counter_text_color">#000000</color>
@@ -26,16 +26,14 @@
 
     <!-- NAV DRAWER MENU ITEMS -->
     <string-array name="nav_drawer_items">
-        <item >Daily Planner</item>
-        <item >Hashtags</item>
-        <item >Settings</item>
+        <item >DAILY PLANNER</item>
+        <item >HASHTAGS</item>
     </string-array>
 
     <!-- NAV DRAWER LIST ITEM ICONS -->
     <array name="nav_drawer_icons">
         <item>@drawable/ic_dailyplanner</item>
         <item>@drawable/ic_hashtags</item>
-        <item>@drawable/ic_settings</item>
     </array>
 
        <string name='desc_list_item_icon'>DICKS</string>

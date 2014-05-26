@@ -1,22 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/txtLabel"
-        android:layout_width="wrap_content"
+
+
+    <RelativeLayout
+        android:id="@+id/rlAddBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="16dp"
-        android:text="Home View"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/black">
 
-    <ImageView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txtLabel"
-        android:src="@drawable/ic_dailyplanner"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"/>
+        <EditText
+            android:layout_marginTop="10dp"
+            android:padding="5dp"
+            android:id="@+id/etTaskTitle"
+            android:layout_width="530dp"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/bAdd"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"
+            android:background="@android:color/background_light"
+            android:hint="Add a new task..."
+            android:ems="10"></EditText>
 
+
+        <ImageButton
+            android:layout_margin="14dp"
+            android:id="@+id/bAdd"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/ic_add_archive"
+            android:focusable="true" />
+    </RelativeLayout>
 
 </RelativeLayout>

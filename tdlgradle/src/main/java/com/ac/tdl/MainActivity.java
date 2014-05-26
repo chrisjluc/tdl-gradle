@@ -1,10 +1,5 @@
 package com.ac.tdl;
 
-import com.ac.tdl.adapter.NavDrawerListAdapter;
-import com.ac.tdl.NavDrawerItem;
-
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -20,10 +15,35 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class MainActivity extends Activity {
+import com.ac.tdl.adapter.DateArrayAdapter;
+import com.ac.tdl.adapter.NavDrawerListAdapter;
+import com.ac.tdl.model.TdlDate;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import antistatic.spinnerwheel.AbstractWheel;
+import antistatic.spinnerwheel.OnWheelChangedListener;
+import antistatic.spinnerwheel.OnWheelClickedListener;
+import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
+
+public class MainActivity extends Activity implements OnWheelClickedListener, OnWheelChangedListener {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    // Calendar
+    private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
+    private static final int DAY_COUNT = 364;
+    private static final int YEAR_COUNT = 4;
+    private AbstractWheel dateWheel, monthWheel, yearWheel;
+    private List<TdlDate> dates;
+    private List<String> years;
 
     // nav drawer title
     private CharSequence mDrawerTitle;
@@ -42,6 +62,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setDates();
+        setUpSpinners();
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -62,9 +85,6 @@ public class MainActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
         // Find People
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-        // Photos
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
-
 
         // Recycle the typed array
         navMenuIcons.recycle();
@@ -92,7 +112,7 @@ public class MainActivity extends Activity {
             }
 
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
+                getActionBar().setTitle("");
                 // calling onPrepareOptionsMenu() to hide action bar icons
                 invalidateOptionsMenu();
             }
@@ -163,9 +183,6 @@ public class MainActivity extends Activity {
             case 1:
                 fragment = new HashtagsFragment();
                 break;
-            case 2:
-                fragment = new SettingFragment();
-                break;
 
             default:
                 break;
@@ -210,6 +227,78 @@ public class MainActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void setDates() {
+        List<TdlDate> dates = new ArrayList<TdlDate>();
+        Calendar calendar = Calendar.getInstance(Locale.CANADA);
+        calendar.add(Calendar.DATE, -DAY_COUNT / 2);
+        for (int i = 0; i < DAY_COUNT; i++) {
+            TdlDate date = new TdlDate();
+            DateFormat format = new SimpleDateFormat("EEEE");
+            date.setDayName(format.format(calendar.getTime()).toUpperCase());
+            format = new SimpleDateFormat("dd");
+            date.setDayNumber(format.format(calendar.getTime()));
+            date.setMonth(calendar.get(Calendar.MONTH));
+            date.setYear(calendar.get(Calendar.YEAR));
+            dates.add(date);
+            calendar.add(Calendar.DATE, 1);
+        }
+        this.dates = dates;
+    }
+
+    private void setUpSpinners() {
+        dateWheel = (AbstractWheel) findViewById(R.id.whvCalendar);
+        DateArrayAdapter dateAdapter = new DateArrayAdapter(getApplicationContext(), dates);
+        dateWheel.setViewAdapter(dateAdapter);
+        //Set to current date
+        dateWheel.setCurrentItem(DAY_COUNT / 2);
+        dateWheel.addClickingListener(this);
+        dateWheel.addChangingListener(this);
+
+        monthWheel = (AbstractWheel) findViewById(R.id.whvMonth);
+        ArrayWheelAdapter<String> monthAdapter =
+                new ArrayWheelAdapter<String>(this, MONTH_NAME);
+        monthAdapter.setItemResource(R.layout.month_item);
+        monthAdapter.setItemTextResource(R.id.tvSimpleItem);
+        monthWheel.setViewAdapter(monthAdapter);
+        monthWheel.setCurrentItem(dates.get(DAY_COUNT / 2).getMonth());
+        monthWheel.setCyclic(true);
+        monthWheel.setEnabled(false);
+
+        yearWheel = (AbstractWheel) findViewById(R.id.whvYear);
+        int currentYear = Calendar.getInstance(Locale.CANADA).get(Calendar.YEAR);
+        String[] years = new String[YEAR_COUNT];
+        for (int i = 0; i < YEAR_COUNT; i++) {
+            years[i] = Integer.toString(currentYear - YEAR_COUNT / 2 + i);
+        }
+        this.years = Arrays.asList(years);
+        ArrayWheelAdapter<String> yearAdapter =
+                new ArrayWheelAdapter<String>(this, years);
+        yearAdapter.setItemResource(R.layout.year_item);
+        yearAdapter.setItemTextResource(R.id.tvSimpleItem);
+        yearWheel.setViewAdapter(yearAdapter);
+        yearWheel.setCurrentItem(YEAR_COUNT / 2);
+        yearWheel.setEnabled(false);
+    }
+
+    public void onChanged(AbstractWheel wheel, int oldValue, int newValue) {
+        switch (wheel.getId()) {
+            case R.id.whvCalendar:
+                TdlDate date = dates.get(newValue);
+                monthWheel.setCurrentItem(date.getMonth(), true);
+                int index = years.indexOf(Integer.toString(date.getYear()));
+                yearWheel.setCurrentItem(index, true);
+                break;
+            case R.id.whvMonth:
+                break;
+            case R.id.whvYear:
+                break;
+        }
+    }
+
+    public void onItemClicked(AbstractWheel wheel, int itemIndex) {
+        wheel.setCurrentItem(itemIndex, true);
     }
 
 }
