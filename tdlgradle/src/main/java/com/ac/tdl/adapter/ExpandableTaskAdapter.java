@@ -3,6 +3,7 @@ package com.ac.tdl.adapter;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
@@ -57,9 +58,25 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> {
         }
         ListView listview = (ListView) view.findViewById(R.id.lvNestedTasks);
         ContextualUndoAdapter adapter= adapterHashmap.get(getItem(i));
+        if(adapter == null)
+            return null;
         adapter.setAbsListView(listview);
         listview.setAdapter(adapter);
-
+        setListViewHeightBasedOnChildren(listview,adapter);
         return view;
+    }
+
+    private void setListViewHeightBasedOnChildren(ListView listView, ContextualUndoAdapter adapter) {
+
+        //All elements have same height
+        View childView = adapter.getView(0, null, listView);
+        childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        int height = childView.getMeasuredHeight() * adapter.getCount();
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = height
+                + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 }
