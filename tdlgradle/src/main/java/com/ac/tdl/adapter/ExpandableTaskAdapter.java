@@ -5,10 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.ac.tdl.EditActivityListener;
 import com.ac.tdl.R;
+import com.ac.tdl.model.Task;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
@@ -18,18 +21,23 @@ import java.util.List;
 /**
  * Created by chrisjluc on 2014-05-25.
  */
-public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> {
+public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> implements AdapterView.OnItemClickListener{
 
     private Context context;
     private HashMap<String, ContextualUndoAdapter> adapterHashmap;
+    private List<String> headerList;
+    private HashMap<String,List<Task>> tasksmap;
+    private EditActivityListener editactivityListener;
 
-    public ExpandableTaskAdapter(Context context,List<String> headerList,HashMap<String, ContextualUndoAdapter> adapterHashmap) {
+    public ExpandableTaskAdapter(Context context, List<String> headerList, HashMap<String,
+            List<Task>> tasksmap, HashMap<String, ContextualUndoAdapter> adapterHashmap, EditActivityListener editactivityListener) {
+
         super(context, R.layout.expandable_item, R.id.header_layout, R.id.content_layout,headerList);
         this.context = context;
+        this.headerList = headerList;
+        this.tasksmap = tasksmap;
         this.adapterHashmap = adapterHashmap;
-        //Only one item is expanded at a time
-        //setLimit(1);
-
+        this.editactivityListener = editactivityListener;
     }
 
     @Override
@@ -48,17 +56,20 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> {
     @Override
     public View getContentView(int i, View convertView, ViewGroup viewGroup) {
         View view = convertView;
-        if(view == null){
+        if (view == null) {
             LayoutInflater vi = LayoutInflater.from(context);
             view = vi.inflate(R.layout.content_item, null);
         }
         ListView listview = (ListView) view.findViewById(R.id.lvNestedTasks);
-        ContextualUndoAdapter adapter= adapterHashmap.get(getItem(i));
-        if(adapter == null)
-            return null;
+        ContextualUndoAdapter adapter = adapterHashmap.get(getItem(i));
+        if (adapter == null || listview == null)
+            return view;
         adapter.setAbsListView(listview);
+
         listview.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(listview,adapter);
+        listview.setOnItemClickListener(this);
+        setListViewHeightBasedOnChildren(listview, adapter);
+        listview.setId(i);
         return view;
     }
 
@@ -74,5 +85,13 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> {
                 + (listView.getDividerHeight() * (adapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        int parentId = parent.getId();
+        List<Task> associatedTasks = tasksmap.get(getItem(parentId));
+        Task task = associatedTasks.get(position);
+        editactivityListener.startActivityFromHomeActivity(task.getTaskId());
     }
 }

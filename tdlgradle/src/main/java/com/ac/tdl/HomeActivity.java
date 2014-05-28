@@ -119,10 +119,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
             adapterMap.put(header,adapter);
         }
 
-        ExpandableTaskAdapter expandableTaskAdapter = new ExpandableTaskAdapter(getApplicationContext(), headerList, adapterMap);
-        ContextualUndoAdapter adapter = new ContextualUndoAdapter(expandableTaskAdapter, R.layout.undo_row, R.id.undo_row_undobutton, this);
-        adapter.setAbsListView(lvTasks);
-        lvTasks.setAdapter(adapter);
+        ExpandableTaskAdapter expandableAdapter = new ExpandableTaskAdapter(getApplicationContext(),
+                headerList,tasksmap, adapterMap, editActivityListener);
+        expandableAdapter.setAbsListView(lvTasks);
+        lvTasks.setAdapter(expandableAdapter);
     }
 
     private HashMap<String,List<Task>> getHeaderTasksHashmap(List<String> headers) {
