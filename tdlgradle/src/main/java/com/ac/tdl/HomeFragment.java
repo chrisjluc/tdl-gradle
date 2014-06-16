@@ -60,7 +60,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        
+        bAdd = (ImageButton) rootView.findViewById(R.id.bAdd);
+        bAdd.setOnClickListener(this);
+        lvTasks = (ListView) rootView.findViewById(R.id.lvTasks);
+
+
+        setupDatabase();
+        loadTasks();
 
         return rootView;
     }

@@ -4,7 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/layout_task_card"
+        android:layout_above="@+id/rlAddBar">
+        <!--
+        android:background="@drawable/layout_task_card">
+        -->
 
+        <ListView
+            android:id="@+id/lvTasks"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:orientation="horizontal"
+            android:dividerHeight="5dp"
+            android:divider="@color/bg_gray"></ListView>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rlAddBar"
