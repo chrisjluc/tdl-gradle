@@ -59,11 +59,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     private EditText etTaskTitle;
     private ImageButton bAdd;
     private SQLiteDatabase db;
-    private List<Task> tasks;
+    private HashMap<Integer, List<Task>> tasksByParentId;
     private List<TdlDate> dates;
     private List<String> years;
     private ListView lvTasks;
-    private TaskAdapter taskAdapter;
     private EditActivityListener editActivityListener = new EditActivityListener() {
 
         @Override
@@ -107,26 +106,30 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     }
 
     public void loadTasks() {
-        tasks = getTasksList();
+        List<Task> tasks = getTasksList();
         List<String> headerList = new ArrayList<String>();
-        HashMap<String,List<Task>> tasksmap = getHeaderTasksHashmap(headerList);
-        HashMap<String,ContextualUndoAdapter> adapterMap = new HashMap<String, ContextualUndoAdapter>();
+        HashMap<String, List<Task>> tasksByHeader = getTasksByHeader(tasks, headerList);
+        HashMap<String, ContextualUndoAdapter> adapterMap = new HashMap<String, ContextualUndoAdapter>();
+        tasksByParentId = new HashMap<Integer, List<Task>>();
 
-        for(String header : headerList){
-            List<Task> taskList = tasksmap.get(header);
+        for (int i = 0; i < headerList.size(); i++) {
+            String header = headerList.get(i);
+            List<Task> taskList = tasksByHeader.get(header);
             TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), taskList);
-            ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter, R.layout.undo_row, R.id.undo_row_undobutton, this);
-            adapterMap.put(header,adapter);
+            ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
+                    R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
+            adapterMap.put(header, adapter);
+            tasksByParentId.put(i, taskList);
         }
 
         ExpandableTaskAdapter expandableAdapter = new ExpandableTaskAdapter(getApplicationContext(),
-                headerList,tasksmap, adapterMap, editActivityListener);
+                headerList, tasksByHeader, adapterMap, editActivityListener);
         expandableAdapter.setAbsListView(lvTasks);
         lvTasks.setAdapter(expandableAdapter);
     }
 
-    private HashMap<String,List<Task>> getHeaderTasksHashmap(List<String> headers) {
-        HashMap<String,List<Task>> map = new HashMap<String, List<Task>>();
+    private HashMap<String, List<Task>> getTasksByHeader(List<Task> tasks, List<String> headers) {
+        HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
         long currentDate = getCurrentDate();
         for (Task task : tasks) {
 
@@ -136,56 +139,56 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
                 c.setTimeInMillis(task.getDateReminder());
                 long taskReminderDate = floorDateByDay(c);
 
-                if(taskReminderDate < currentDate){
+                if (taskReminderDate < currentDate) {
 
-                    if(!map.containsKey(INCOMPLETE)) {
+                    if (!map.containsKey(INCOMPLETE)) {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(INCOMPLETE, tasksList);
                         headers.add(INCOMPLETE);
-                    }else {
+                    } else {
                         List<Task> tasksList = map.get(INCOMPLETE);
                         tasksList.add(task);
                         map.put(INCOMPLETE, tasksList);
                     }
 
-                }else if(taskReminderDate == currentDate){
+                } else if (taskReminderDate == currentDate) {
 
-                    if(!map.containsKey(TODAY)) {
+                    if (!map.containsKey(TODAY)) {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(TODAY, tasksList);
                         headers.add(TODAY);
-                    }else {
+                    } else {
                         List<Task> tasksList = map.get(TODAY);
                         tasksList.add(task);
                         map.put(TODAY, tasksList);
                     }
 
-                }else{
+                } else {
 
                     Date date = new Date(taskReminderDate);
                     String dateHeader = new SimpleDateFormat("EEEE MMM d").format(date);
 
-                    if(!map.containsKey(dateHeader)) {
+                    if (!map.containsKey(dateHeader)) {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(dateHeader, tasksList);
                         headers.add(dateHeader);
-                    }else {
+                    } else {
                         List<Task> tasksList = map.get(dateHeader);
                         tasksList.add(task);
                         map.put(dateHeader, tasksList);
                     }
                 }
-            }else{
+            } else {
                 //if reminder date is zero, it's not set so just put that task under today
-                if(!map.containsKey(TODAY)) {
+                if (!map.containsKey(TODAY)) {
                     List<Task> tasksList = new ArrayList<Task>();
                     tasksList.add(task);
                     map.put(TODAY, tasksList);
                     headers.add(TODAY);
-                }else {
+                } else {
                     List<Task> tasksList = map.get(TODAY);
                     tasksList.add(task);
                     map.put(TODAY, tasksList);
@@ -196,11 +199,13 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     }
 
     @Override
-    public void deleteItem(final int position) {
-        Task task = tasks.get(position);
-        taskAdapter.remove(task);
-        taskAdapter.notifyDataSetChanged();
+    public void deleteItem(final int position, View view) {
+        View parent = (View) view.getParent();
+        int parentId = parent.getId();
+        List<Task> associatedTasks = tasksByParentId.get(parentId);
+        Task task = associatedTasks.get(position);
         task.updateArchived(true);
+        loadTasks();
     }
 
     /**
