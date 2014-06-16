@@ -35,51 +35,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b6a0b088-3b47-40b7-98d2-2124d9b38c38" name="Default" comment="@aaronte - Fixed crash when Hashtag[] array is null">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/libs/nineoldandroids-2.4.0.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/libs/stickylistheaders_lib.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/util/AdapterViewUtil.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/prepared/AlphaInAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/AndroidManifest.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/AnimateAdditionAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/AnimateDismissAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/AnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/ArrayAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/BaseAdapterDecorator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/contextualundo/ContextualUndoAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/contextualundo/ContextualUndoListViewTouchListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/contextualundo/ContextualUndoView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/DismissableManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/widget/DynamicListView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/ExpandCollapseListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/ExpandableListItemAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/InsertQueue.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/ListViewSetter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/OnDismissCallback.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/ResourceAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/prepared/ScaleInAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/SingleAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/prepared/SwingBottomInAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/prepared/SwingLeftInAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/swinginadapters/prepared/SwingRightInAnimationAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/SwipeDismissAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/SwipeDismissListViewTouchListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/SwipeOnScrollListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/SwipeOnTouchListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/build.gradle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/gradle.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tdlgradle/src/main/res/drawable-hdpi/layout_row_shadow.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/listviewanimations.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/listviewanimations/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tdlgradle/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/tdlgradle/src/main/AndroidManifest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java" afterPath="$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spinnerwheel/build.gradle" afterPath="$PROJECT_DIR$/spinnerwheel/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tdlgradle/build.gradle" afterPath="$PROJECT_DIR$/tdlgradle/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/settings.gradle" afterPath="$PROJECT_DIR$/settings.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spinnerwheel/spinnerwheel.iml" afterPath="$PROJECT_DIR$/spinnerwheel/spinnerwheel.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tdl-gradle.iml" afterPath="$PROJECT_DIR$/tdl-gradle.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tdlgradle/tdlgradle.iml" afterPath="$PROJECT_DIR$/tdlgradle/tdlgradle.iml" />
     </list>
     <ignored path="tdl-gradle.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -142,24 +98,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="HomeActivity.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="HomeActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.769231" vertical-offset="210" max-vertical-offset="6855">
-              <caret line="24" column="48" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
+            <state vertical-scroll-proportion="0.6097561" vertical-offset="540" max-vertical-offset="6855">
+              <caret line="61" column="12" selection-start-line="61" selection-start-column="12" selection-end-line="61" selection-end-column="12" />
               <folding>
-                <element signature="e#3903#3911#0" expanded="true" />
-                <element signature="e#5642#5648#0" expanded="true" />
-                <element signature="e#6192#6198#0" expanded="true" />
-                <element signature="e#6841#6847#0" expanded="true" />
-                <element signature="e#7450#7456#0" expanded="true" />
-                <element signature="e#8478#8484#0" expanded="true" />
-                <element signature="e#8544#8550#0" expanded="true" />
-                <element signature="e#9299#9305#0" expanded="true" />
-                <element signature="e#12279#12287#0" expanded="true" />
-                <element signature="e#14151#14159#0" expanded="true" />
-                <element signature="e#14950#14958#0" expanded="true" />
-                <element signature="e#15462#15471#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#3911#3919#0" expanded="true" />
+                <element signature="e#5650#5656#0" expanded="true" />
+                <element signature="e#6200#6206#0" expanded="true" />
+                <element signature="e#6849#6855#0" expanded="true" />
+                <element signature="e#7458#7464#0" expanded="true" />
+                <element signature="e#8486#8492#0" expanded="true" />
+                <element signature="e#8552#8558#0" expanded="true" />
+                <element signature="e#9307#9313#0" expanded="true" />
+                <element signature="e#12287#12295#0" expanded="true" />
+                <element signature="e#14159#14167#0" expanded="true" />
+                <element signature="e#14958#14966#0" expanded="true" />
+                <element signature="e#15470#15479#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -175,11 +132,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tdlgradle/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3440367" vertical-offset="0" max-vertical-offset="675">
-              <caret line="15" column="49" selection-start-line="15" selection-start-column="49" selection-end-line="15" selection-end-column="49" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="675">
+              <caret line="11" column="14" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -2345,10 +2302,10 @@
         <option value="$PROJECT_DIR$/settings.gradle" />
         <option value="$PROJECT_DIR$/listviewanimations/build.gradle" />
         <option value="$PROJECT_DIR$/listviewanimations/src/com/nhaarman/listviewanimations/itemmanipulation/swipedismiss/contextualundo/ContextualUndoAdapter.java" />
-        <option value="$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/spinnerwheel/build.gradle" />
         <option value="$PROJECT_DIR$/tdlgradle/build.gradle" />
+        <option value="$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java" />
       </list>
     </option>
   </component>
@@ -2910,7 +2867,7 @@
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2811159" sideWeight="0.12314225" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27884614" sideWeight="0.49928468" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27136752" sideWeight="0.5379113" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27136752" sideWeight="0.5379113" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32939634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24969174" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -3373,27 +3330,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.769231" vertical-offset="210" max-vertical-offset="6855">
-          <caret line="24" column="48" selection-start-line="24" selection-start-column="48" selection-end-line="24" selection-end-column="48" />
-          <folding>
-            <element signature="e#3903#3911#0" expanded="true" />
-            <element signature="e#5642#5648#0" expanded="true" />
-            <element signature="e#6192#6198#0" expanded="true" />
-            <element signature="e#6841#6847#0" expanded="true" />
-            <element signature="e#7450#7456#0" expanded="true" />
-            <element signature="e#8478#8484#0" expanded="true" />
-            <element signature="e#8544#8550#0" expanded="true" />
-            <element signature="e#9299#9305#0" expanded="true" />
-            <element signature="e#12279#12287#0" expanded="true" />
-            <element signature="e#14151#14159#0" expanded="true" />
-            <element signature="e#14950#14958#0" expanded="true" />
-            <element signature="e#15462#15471#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="465">
@@ -3420,9 +3356,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tdlgradle/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3440367" vertical-offset="0" max-vertical-offset="675">
-          <caret line="15" column="49" selection-start-line="15" selection-start-column="49" selection-end-line="15" selection-end-column="49" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="675">
+          <caret line="11" column="14" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6097561" vertical-offset="540" max-vertical-offset="6855">
+          <caret line="61" column="12" selection-start-line="61" selection-start-column="12" selection-end-line="61" selection-end-column="12" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#3911#3919#0" expanded="true" />
+            <element signature="e#5650#5656#0" expanded="true" />
+            <element signature="e#6200#6206#0" expanded="true" />
+            <element signature="e#6849#6855#0" expanded="true" />
+            <element signature="e#7458#7464#0" expanded="true" />
+            <element signature="e#8486#8492#0" expanded="true" />
+            <element signature="e#8552#8558#0" expanded="true" />
+            <element signature="e#9307#9313#0" expanded="true" />
+            <element signature="e#12287#12295#0" expanded="true" />
+            <element signature="e#14159#14167#0" expanded="true" />
+            <element signature="e#14958#14966#0" expanded="true" />
+            <element signature="e#15470#15479#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
