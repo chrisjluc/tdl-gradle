@@ -101,22 +101,22 @@
       <file leaf-file-name="HomeActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6097561" vertical-offset="540" max-vertical-offset="6855">
-              <caret line="61" column="12" selection-start-line="61" selection-start-column="12" selection-end-line="61" selection-end-column="12" />
+            <state vertical-scroll-proportion="0.5609756" vertical-offset="540" max-vertical-offset="6855">
+              <caret line="59" column="29" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3911#3919#0" expanded="true" />
-                <element signature="e#5650#5656#0" expanded="true" />
-                <element signature="e#6200#6206#0" expanded="true" />
-                <element signature="e#6849#6855#0" expanded="true" />
-                <element signature="e#7458#7464#0" expanded="true" />
-                <element signature="e#8486#8492#0" expanded="true" />
-                <element signature="e#8552#8558#0" expanded="true" />
-                <element signature="e#9307#9313#0" expanded="true" />
-                <element signature="e#12287#12295#0" expanded="true" />
-                <element signature="e#14159#14167#0" expanded="true" />
-                <element signature="e#14958#14966#0" expanded="true" />
-                <element signature="e#15470#15479#0" expanded="true" />
+                <element signature="e#3912#3920#0" expanded="true" />
+                <element signature="e#5663#5669#0" expanded="true" />
+                <element signature="e#6218#6224#0" expanded="true" />
+                <element signature="e#6871#6877#0" expanded="true" />
+                <element signature="e#7484#7490#0" expanded="true" />
+                <element signature="e#8513#8519#0" expanded="true" />
+                <element signature="e#8579#8585#0" expanded="true" />
+                <element signature="e#9334#9340#0" expanded="true" />
+                <element signature="e#12314#12322#0" expanded="true" />
+                <element signature="e#14186#14194#0" expanded="true" />
+                <element signature="e#14985#14993#0" expanded="true" />
+                <element signature="e#15497#15506#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -3364,22 +3364,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tdlgradle/src/main/java/com/ac/tdl/HomeActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6097561" vertical-offset="540" max-vertical-offset="6855">
-          <caret line="61" column="12" selection-start-line="61" selection-start-column="12" selection-end-line="61" selection-end-column="12" />
+        <state vertical-scroll-proportion="0.5609756" vertical-offset="540" max-vertical-offset="6855">
+          <caret line="59" column="29" selection-start-line="59" selection-start-column="29" selection-end-line="59" selection-end-column="29" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3911#3919#0" expanded="true" />
-            <element signature="e#5650#5656#0" expanded="true" />
-            <element signature="e#6200#6206#0" expanded="true" />
-            <element signature="e#6849#6855#0" expanded="true" />
-            <element signature="e#7458#7464#0" expanded="true" />
-            <element signature="e#8486#8492#0" expanded="true" />
-            <element signature="e#8552#8558#0" expanded="true" />
-            <element signature="e#9307#9313#0" expanded="true" />
-            <element signature="e#12287#12295#0" expanded="true" />
-            <element signature="e#14159#14167#0" expanded="true" />
-            <element signature="e#14958#14966#0" expanded="true" />
-            <element signature="e#15470#15479#0" expanded="true" />
+            <element signature="e#3912#3920#0" expanded="true" />
+            <element signature="e#5663#5669#0" expanded="true" />
+            <element signature="e#6218#6224#0" expanded="true" />
+            <element signature="e#6871#6877#0" expanded="true" />
+            <element signature="e#7484#7490#0" expanded="true" />
+            <element signature="e#8513#8519#0" expanded="true" />
+            <element signature="e#8579#8585#0" expanded="true" />
+            <element signature="e#9334#9340#0" expanded="true" />
+            <element signature="e#12314#12322#0" expanded="true" />
+            <element signature="e#14186#14194#0" expanded="true" />
+            <element signature="e#14985#14993#0" expanded="true" />
+            <element signature="e#15497#15506#0" expanded="true" />
           </folding>
         </state>
       </provider>
