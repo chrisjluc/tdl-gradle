@@ -2,15 +2,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="4dp">
 
     <FrameLayout
-        android:id="@+id/task_title"
+        android:id="@+id/header_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <FrameLayout
-        android:id="@+id/task_content"
+        android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp" />

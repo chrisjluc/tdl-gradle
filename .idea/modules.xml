@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/listviewanimations/listviewanimations.iml" filepath="$PROJECT_DIR$/listviewanimations/listviewanimations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spinnerwheel/spinnerwheel.iml" filepath="$PROJECT_DIR$/spinnerwheel/spinnerwheel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tdl-gradle.iml" filepath="$PROJECT_DIR$/tdl-gradle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tdlgradle/tdlgradle.iml" filepath="$PROJECT_DIR$/tdlgradle/tdlgradle.iml" />
+    </modules>
+  </component>
+</project>
+

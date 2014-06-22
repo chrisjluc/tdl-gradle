@@ -22,18 +22,21 @@ import com.ac.tdl.SQL.DbContract.HashtagTable;
 import com.ac.tdl.SQL.DbContract.TaskTable;
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.adapter.DateArrayAdapter;
+import com.ac.tdl.adapter.ExpandableTaskAdapter;
 import com.ac.tdl.adapter.TaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 import com.ac.tdl.model.TdlDate;
-import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,20 +45,24 @@ import antistatic.spinnerwheel.OnWheelChangedListener;
 import antistatic.spinnerwheel.OnWheelClickedListener;
 import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
-public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener, OnWheelChangedListener {
+public class HomeActivity extends FragmentActivity implements OnClickListener, OnWheelClickedListener,
+        OnWheelChangedListener, ContextualUndoAdapter.DeleteItemCallback {
+
     private static final int EDIT_ACTIVITY = 1;
     private static final String[] MONTH_NAME = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
     private static final int DAY_COUNT = 364;
     private static final int YEAR_COUNT = 4;
+    private static final String INCOMPLETE = "incomplete";
+    private static final String TODAY = "Today";
+
     private AbstractWheel dateWheel, monthWheel, yearWheel;
     private EditText etTaskTitle;
     private ImageButton bAdd;
     private SQLiteDatabase db;
-    private List<Task> tasks;
+    private HashMap<Integer, List<Task>> tasksByParentId;
     private List<TdlDate> dates;
     private List<String> years;
     private ListView lvTasks;
-    private ScaleInAnimationAdapter scaleInAnimationAdapter;
     private EditActivityListener editActivityListener = new EditActivityListener() {
 
         @Override
@@ -99,12 +106,106 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
     }
 
     public void loadTasks() {
-        tasks = getTasksList();
-        TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), tasks, editActivityListener);
-        scaleInAnimationAdapter = new ScaleInAnimationAdapter(taskAdapter);
-        scaleInAnimationAdapter.setAbsListView(lvTasks);
-        scaleInAnimationAdapter.setInitialDelayMillis(0);
-        lvTasks.setAdapter(scaleInAnimationAdapter);
+        List<Task> tasks = getTasksList();
+        List<String> headerList = new ArrayList<String>();
+        HashMap<String, List<Task>> tasksByHeader = getTasksByHeader(tasks, headerList);
+        HashMap<String, ContextualUndoAdapter> adapterMap = new HashMap<String, ContextualUndoAdapter>();
+        tasksByParentId = new HashMap<Integer, List<Task>>();
+
+        for (int i = 0; i < headerList.size(); i++) {
+            String header = headerList.get(i);
+            List<Task> taskList = tasksByHeader.get(header);
+            TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), taskList);
+            ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
+                    R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
+            adapterMap.put(header, adapter);
+            tasksByParentId.put(i, taskList);
+        }
+
+        ExpandableTaskAdapter expandableAdapter = new ExpandableTaskAdapter(getApplicationContext(),
+                headerList, tasksByHeader, adapterMap, editActivityListener);
+        expandableAdapter.setAbsListView(lvTasks);
+        lvTasks.setAdapter(expandableAdapter);
+    }
+
+    private HashMap<String, List<Task>> getTasksByHeader(List<Task> tasks, List<String> headers) {
+        HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
+        long currentDate = getCurrentDate();
+        for (Task task : tasks) {
+
+            //If Reminderdate is set
+            if (task.getDateReminder() > 0) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(task.getDateReminder());
+                long taskReminderDate = floorDateByDay(c);
+
+                if (taskReminderDate < currentDate) {
+
+                    if (!map.containsKey(INCOMPLETE)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(INCOMPLETE, tasksList);
+                        headers.add(INCOMPLETE);
+                    } else {
+                        List<Task> tasksList = map.get(INCOMPLETE);
+                        tasksList.add(task);
+                        map.put(INCOMPLETE, tasksList);
+                    }
+
+                } else if (taskReminderDate == currentDate) {
+
+                    if (!map.containsKey(TODAY)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(TODAY, tasksList);
+                        headers.add(TODAY);
+                    } else {
+                        List<Task> tasksList = map.get(TODAY);
+                        tasksList.add(task);
+                        map.put(TODAY, tasksList);
+                    }
+
+                } else {
+
+                    Date date = new Date(taskReminderDate);
+                    String dateHeader = new SimpleDateFormat("EEEE MMM d").format(date);
+
+                    if (!map.containsKey(dateHeader)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(dateHeader, tasksList);
+                        headers.add(dateHeader);
+                    } else {
+                        List<Task> tasksList = map.get(dateHeader);
+                        tasksList.add(task);
+                        map.put(dateHeader, tasksList);
+                    }
+                }
+            } else {
+                //if reminder date is zero, it's not set so just put that task under today
+                if (!map.containsKey(TODAY)) {
+                    List<Task> tasksList = new ArrayList<Task>();
+                    tasksList.add(task);
+                    map.put(TODAY, tasksList);
+                    headers.add(TODAY);
+                } else {
+                    List<Task> tasksList = map.get(TODAY);
+                    tasksList.add(task);
+                    map.put(TODAY, tasksList);
+                }
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public void deleteItem(final int position, View view) {
+        View parent = (View) view.getParent();
+        int parentId = parent.getId();
+        List<Task> associatedTasks = tasksByParentId.get(parentId);
+        Task task = associatedTasks.get(position);
+        task.updateArchived(true);
+        loadTasks();
     }
 
     /**
@@ -141,26 +242,30 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         //12:00 am of currentday
         long currentDayTimestamp = getCurrentDate();
 
-        for(Task orderedTask : orderedTaskList){
+        for (Task orderedTask : orderedTaskList) {
 
             //Ordered tasks at 12:00 am on current date will appear after empty reminders
-            if(orderedTask.getDateReminder() >= currentDayTimestamp) {
+            if (orderedTask.getDateReminder() >= currentDayTimestamp) {
                 mergedTaskList.addAll(emptyReminderTaskList);
                 break;
             }
             mergedTaskList.add(orderedTask);
             index++;
         }
-        mergedTaskList.addAll(orderedTaskList.subList(index,orderedTaskList.size()));
+        mergedTaskList.addAll(orderedTaskList.subList(index, orderedTaskList.size()));
         return mergedTaskList;
     }
 
     private long getCurrentDate() {
         Calendar c = new GregorianCalendar();
+        return floorDateByDay(c);
+    }
+
+    private long floorDateByDay(Calendar c) {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND,0);
+        c.set(Calendar.MILLISECOND, 0);
         return c.getTime().getTime();
     }
 
@@ -192,21 +297,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
                 .withDb(db)
                 .build();
         task.saveModel();
-        tasks.add(0, task);
-        scaleInAnimationAdapter.notifyDataSetChanged();
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
 
         loadTasks();
-    }
-
-    public void archiveTask(int taskId) {
-        Task task = new TaskBuilder()
-                .withTaskId(taskId)
-                .withDb(db)
-                .build();
-        task.updateArchived(true);
     }
 
     /**
