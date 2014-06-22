@@ -2,18 +2,6 @@
 <pre-dex-items>
 
     <item
-        dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/classes-e7256f835e7d2e568e102edc8223c8177c21203f.jar"
-        jar="/Users/aaronte/Projects/tdl/tdl-gradle/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
-    <item
-        dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/library-2.5.2-70ee895914d2dec2e8d9825fa654afe5661ab258.jar"
-        jar="/Users/aaronte/.gradle/caches/modules-2/files-2.1/com.nhaarman.listviewanimations/library/2.5.2/71ed91f526c48ea1ebcc7c78f530b914cbf06a3c/library-2.5.2.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="71ed91f526c48ea1ebcc7c78f530b914cbf06a3c"/>
-    <item
         dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/classes-51f514d6c6e5b0718ed25287ace6a0093f947a40.jar"
         jar="/Users/aaronte/Projects/tdl/tdl-gradle/build/intermediates/exploded-aar/tdl-gradle/spinnerwheel/unspecified/classes.jar"
         jumboMode="false"
@@ -25,6 +13,18 @@
         jumboMode="false"
         revision="19.1.0"
         sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb"/>
+    <item
+        dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/classes-e7256f835e7d2e568e102edc8223c8177c21203f.jar"
+        jar="/Users/aaronte/Projects/tdl/tdl-gradle/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/classes-fcf6ec5e4770ca2e8db099950e95e432bb11c45f.jar"
+        jar="/Users/aaronte/Projects/tdl/tdl-gradle/build/intermediates/exploded-aar/tdl-gradle/listviewanimations/unspecified/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="2a7681aabff87063daaf44a53e5492397e9113df"/>
     <item
         dex="/Users/aaronte/Projects/tdl/tdl-gradle/tdlgradle/build/intermediates/pre-dexed/debug/support-v4-19.1.0-fe930dc68beb1e566675ce71b270d4091c6c249b.jar"
         jar="/Applications/Android Studio.app/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
