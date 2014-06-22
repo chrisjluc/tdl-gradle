@@ -14,12 +14,10 @@ import java.util.List;
 
 public class TaskAdapter extends ArrayAdapter<Task> {
     private Context context;
-    private List<Task> taskList;
 
 	public TaskAdapter(Context context,List<Task> taskList) {
 		super(context, R.id.tvTaskTitle,taskList);
         this.context = context;
-        this.taskList = taskList;
 	}
 
     @Override
