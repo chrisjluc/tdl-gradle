@@ -229,9 +229,11 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
             else
                 orderedTaskList.add(t);
         }
-        if (emptyReminderTaskList.size() > 0) {
+        if(orderedTaskList.size() == 0)
+            return emptyReminderTaskList;
+        else if (emptyReminderTaskList.size() > 0)
             return mergeListsOnReminderDate(orderedTaskList, emptyReminderTaskList);
-        }
+
         return orderedTaskList;
     }
 
@@ -247,11 +249,14 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
             //Ordered tasks at 12:00 am on current date will appear after empty reminders
             if (orderedTask.getDateReminder() >= currentDayTimestamp) {
                 mergedTaskList.addAll(emptyReminderTaskList);
+                emptyReminderTaskList = null;
                 break;
             }
             mergedTaskList.add(orderedTask);
             index++;
         }
+        if(emptyReminderTaskList != null)
+            mergedTaskList.addAll(emptyReminderTaskList);
         mergedTaskList.addAll(orderedTaskList.subList(index, orderedTaskList.size()));
         return mergedTaskList;
     }
