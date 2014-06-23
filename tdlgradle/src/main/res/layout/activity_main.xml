@@ -9,16 +9,14 @@
     <!-- Framelayout to display Fragments -->
     <FrameLayout
         android:id="@+id/frame_calendar"
-        android:layout_width="fill_parent"
-        android:layout_height="500dp"
-        android:layout_above="@+id/frame_container"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <!-- Framelayout to display Fragments -->
     <FrameLayout
         android:id="@+id/frame_container"
-        android:layout_width="0dp"
-        android:layout_height="500dp"
-        android:layout_below="@+id/frame_calendar"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <!-- Listview to display slider menu -->
     <ListView

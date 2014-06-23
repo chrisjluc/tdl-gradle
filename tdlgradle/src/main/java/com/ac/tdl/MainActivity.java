@@ -181,7 +181,7 @@ public class MainActivity extends Activity {
         Fragment calender = new CalendarFragment();
         FragmentManager fragmentManager = getFragmentManager();
 
-        fragmentManager.beginTransaction().replace(R.id.frame_calendar, calender).commit();
+        fragmentManager.beginTransaction().add(R.id.frame_calendar, calender).commit();
 
         if (fragment != null) {
             fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
