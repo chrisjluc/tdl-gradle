@@ -23,6 +23,7 @@ import com.ac.tdl.adapter.TaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 import com.ac.tdl.model.TdlDate;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +45,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         @Override
         public void startActivityFromHomeActivity(int i) {
             Intent intent = new Intent(getActivity().getApplicationContext(), EditActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("taskId", i);
             startActivityForResult(intent, EDIT_ACTIVITY);
         }

@@ -85,10 +85,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         actionBar.hide();
 
         // Initialize setup
-        setDates();
-        setUpActionBar();
+        setDates(); // MOVED
+        setUpActionBar(); // DONT NEED 
         setUpViews();
-        setUpSpinners();
+        setUpSpinners(); // MOVED
         setupDatabase();
         loadTasks();
     }
@@ -364,12 +364,63 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         header.setText("DAILY PLANNER");
     }
 
-    private void setUpActionBar() {
-        ActionBar ab = getActionBar();
-        ab.setHomeButtonEnabled(true);
-        ab.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+
+    private void setupDatabase() {
+        DbHelper mDbHelper = DbHelper.getInstance(getBaseContext());
+        db = mDbHelper.getWritableDatabase();
     }
 
+
+    @SuppressWarnings("static-access")
+    private void hideKeyboard(EditText et) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(
+                getApplicationContext().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+    }
+
+    /* MOVED TO CALENDARFRAGMENT.JAVA */
+    @Override
+    public void onChanged(AbstractWheel wheel, int oldValue, int newValue) {
+        switch (wheel.getId()) {
+            case R.id.whvCalendar:
+                TdlDate date = dates.get(newValue);
+                monthWheel.setCurrentItem(date.getMonth(), true);
+                int index = years.indexOf(Integer.toString(date.getYear()));
+                yearWheel.setCurrentItem(index, true);
+                break;
+            case R.id.whvMonth:
+                break;
+            case R.id.whvYear:
+                break;
+        }
+    }
+
+    /* MOVED TO CALENDARFRAGMENT.JAVA */
+    @Override
+    public void onItemClicked(AbstractWheel wheel, int itemIndex) {
+        wheel.setCurrentItem(itemIndex, true);
+    }
+
+    /* MOVED TO CALENDARFRAGMENT.JAVA */
+    private void setDates() {
+        List<TdlDate> dates = new ArrayList<TdlDate>();
+        Calendar calendar = Calendar.getInstance(Locale.CANADA);
+        calendar.add(Calendar.DATE, -DAY_COUNT / 2);
+        for (int i = 0; i < DAY_COUNT; i++) {
+            TdlDate date = new TdlDate();
+            DateFormat format = new SimpleDateFormat("EEEE");
+            date.setDayName(format.format(calendar.getTime()).toUpperCase());
+            format = new SimpleDateFormat("dd");
+            date.setDayNumber(format.format(calendar.getTime()));
+            date.setMonth(calendar.get(Calendar.MONTH));
+            date.setYear(calendar.get(Calendar.YEAR));
+            dates.add(date);
+            calendar.add(Calendar.DATE, 1);
+        }
+        this.dates = dates;
+    }
+
+    /* MOVED TO CALENDERFRAGMENT.JAVA */
     private void setUpSpinners() {
         dateWheel = (AbstractWheel) findViewById(R.id.whvCalendar);
         DateArrayAdapter dateAdapter = new DateArrayAdapter(getApplicationContext(), dates);
@@ -405,57 +456,10 @@ public class HomeActivity extends FragmentActivity implements OnClickListener, O
         yearWheel.setEnabled(false);
     }
 
-
-    private void setupDatabase() {
-        DbHelper mDbHelper = DbHelper.getInstance(getBaseContext());
-        db = mDbHelper.getWritableDatabase();
+    /* DONT NEED ANYMORE */
+    private void setUpActionBar() {
+        ActionBar ab = getActionBar();
+        ab.setHomeButtonEnabled(true);
+        ab.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
     }
-
-    private void setDates() {
-        List<TdlDate> dates = new ArrayList<TdlDate>();
-        Calendar calendar = Calendar.getInstance(Locale.CANADA);
-        calendar.add(Calendar.DATE, -DAY_COUNT / 2);
-        for (int i = 0; i < DAY_COUNT; i++) {
-            TdlDate date = new TdlDate();
-            DateFormat format = new SimpleDateFormat("EEEE");
-            date.setDayName(format.format(calendar.getTime()).toUpperCase());
-            format = new SimpleDateFormat("dd");
-            date.setDayNumber(format.format(calendar.getTime()));
-            date.setMonth(calendar.get(Calendar.MONTH));
-            date.setYear(calendar.get(Calendar.YEAR));
-            dates.add(date);
-            calendar.add(Calendar.DATE, 1);
-        }
-        this.dates = dates;
-    }
-
-    @SuppressWarnings("static-access")
-    private void hideKeyboard(EditText et) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(
-                getApplicationContext().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
-    }
-
-    @Override
-    public void onChanged(AbstractWheel wheel, int oldValue, int newValue) {
-        switch (wheel.getId()) {
-            case R.id.whvCalendar:
-                TdlDate date = dates.get(newValue);
-                monthWheel.setCurrentItem(date.getMonth(), true);
-                int index = years.indexOf(Integer.toString(date.getYear()));
-                yearWheel.setCurrentItem(index, true);
-                break;
-            case R.id.whvMonth:
-                break;
-            case R.id.whvYear:
-                break;
-        }
-    }
-
-    @Override
-    public void onItemClicked(AbstractWheel wheel, int itemIndex) {
-        wheel.setCurrentItem(itemIndex, true);
-    }
-
-
 }
