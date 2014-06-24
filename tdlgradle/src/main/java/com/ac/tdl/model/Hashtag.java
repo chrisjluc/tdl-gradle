@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.ac.tdl.SQL.DbContract;
+import com.ac.tdl.SQL.DbHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Hashtag extends Model implements DbContract {
@@ -16,8 +18,8 @@ public class Hashtag extends Model implements DbContract {
 	private long dateCreated;
 	private int taskId;
 	private boolean archived;
-	private SQLiteDatabase db;
-	
+	private static SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
+
 	/**
 	 * Important: Need DB if you want to perform SQL cmds
 	 * @param hashtagId
@@ -25,17 +27,28 @@ public class Hashtag extends Model implements DbContract {
 	 * @param dateCreated
 	 * @param taskId
 	 * @param archived
-	 * @param db
 	 */
 	public Hashtag(int hashtagId, String label, long dateCreated, int taskId,
-			boolean archived, SQLiteDatabase db) {
+			boolean archived) {
 		this.hashtagId = hashtagId;
 		this.label = label;
 		this.dateCreated = dateCreated;
 		this.taskId = taskId;
 		this.archived = archived;
-		this.db = db;
 	}
+
+    public Hashtag(){}
+
+    public static String[] getHashtagLabelsInDb() {
+        String[] projection = {DbContract.HashtagTable.COLUMN_NAME_HASHTAG_LABEL};
+        Cursor cursor = db.query(true, DbContract.HashtagTable.TABLE_NAME, projection,
+                null, null, null, null, null, null);
+        ArrayList<String> hashtagArray = new ArrayList<String>();
+        while (cursor.moveToNext()) {
+            hashtagArray.add(cursor.getString(0));
+        }
+        return hashtagArray.toArray(new String[hashtagArray.size()]);
+    }
 
 	@Override
 	public void getModelFromDb() {

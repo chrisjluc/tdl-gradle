@@ -6,8 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.ac.tdl.SQL.DbContract;
+import com.ac.tdl.SQL.DbHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +33,10 @@ public class Task extends Model implements DbContract {
 
     // Additional attributes
     private Hashtag[] hashtagArray;
-    private SQLiteDatabase db;
+
+    private static final String INCOMPLETE = "incomplete";
+    private static final String TODAY = "Today";
+    private static SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
 
     /**
      * Important: need DB is you want SQL cmds
@@ -44,13 +52,11 @@ public class Task extends Model implements DbContract {
      * @param isComplete
      * @param archived
      * @param hashtagArray
-     * @param db
      */
     public Task(int taskId, String taskTitle, String taskDetails,
                 boolean priority, long dateCreated, long dateReminder,
                 long repetitionInMS, long notifyBeforeReminderInMS,
-                boolean isComplete, boolean archived, Hashtag[] hashtagArray,
-                SQLiteDatabase db) {
+                boolean isComplete, boolean archived, Hashtag[] hashtagArray) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
         if (taskDetails == null || taskDetails.isEmpty())
@@ -65,7 +71,143 @@ public class Task extends Model implements DbContract {
         this.isComplete = isComplete;
         this.archived = archived;
         this.hashtagArray = hashtagArray;
-        this.db = db;
+    }
+
+    public Task() {
+    }
+
+    public static HashMap<String, List<Task>> getTasksByHeader(List<String> headers) {
+        HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
+
+        long currentDate = getCurrentDate();
+        for (Task task : getTasksList()) {
+
+            //If Reminderdate is set
+            if (task.getDateReminder() > 0) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(task.getDateReminder());
+                long taskReminderDate = floorDateByDay(c);
+
+                if (taskReminderDate < currentDate) {
+
+                    if (!map.containsKey(INCOMPLETE)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(INCOMPLETE, tasksList);
+                        headers.add(INCOMPLETE);
+                    } else {
+                        List<Task> tasksList = map.get(INCOMPLETE);
+                        tasksList.add(task);
+                        map.put(INCOMPLETE, tasksList);
+                    }
+
+                } else if (taskReminderDate == currentDate) {
+
+                    if (!map.containsKey(TODAY)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(TODAY, tasksList);
+                        headers.add(TODAY);
+                    } else {
+                        List<Task> tasksList = map.get(TODAY);
+                        tasksList.add(task);
+                        map.put(TODAY, tasksList);
+                    }
+
+                } else {
+
+                    Date date = new Date(taskReminderDate);
+                    String dateHeader = new SimpleDateFormat("EEEE MMM d").format(date);
+
+                    if (!map.containsKey(dateHeader)) {
+                        List<Task> tasksList = new ArrayList<Task>();
+                        tasksList.add(task);
+                        map.put(dateHeader, tasksList);
+                        headers.add(dateHeader);
+                    } else {
+                        List<Task> tasksList = map.get(dateHeader);
+                        tasksList.add(task);
+                        map.put(dateHeader, tasksList);
+                    }
+                }
+            } else {
+                //if reminder date is zero, it's not set so just put that task under today
+                if (!map.containsKey(TODAY)) {
+                    List<Task> tasksList = new ArrayList<Task>();
+                    tasksList.add(task);
+                    map.put(TODAY, tasksList);
+                    headers.add(TODAY);
+                } else {
+                    List<Task> tasksList = map.get(TODAY);
+                    tasksList.add(task);
+                    map.put(TODAY, tasksList);
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
+     * From Earliest task to latest task
+     * tasks with no reminder date will always be the first under 'today' section
+     *
+     * @return tasksList
+     */
+    public static List<Task> getTasksList() {
+        Cursor cursor = getUnarchivedTaskIds();
+        List<Task> orderedTaskList = new ArrayList<Task>();
+        List<Task> emptyReminderTaskList = new ArrayList<Task>();
+        while (cursor.moveToNext()) {
+            Task t = new Task();
+            t.setTaskId(cursor.getInt(cursor
+                    .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_ID)));
+            t.getModelFromDb();
+
+            if (t.getDateReminder() == 0)
+                emptyReminderTaskList.add(t);
+            else
+                orderedTaskList.add(t);
+        }
+        if (orderedTaskList.size() == 0)
+            return emptyReminderTaskList;
+        else if (emptyReminderTaskList.size() > 0)
+            return mergeListsOnReminderDate(orderedTaskList, emptyReminderTaskList);
+
+        return orderedTaskList;
+    }
+
+    private static Cursor getUnarchivedTaskIds() {
+        String[] projection = {DbContract.TaskTable.COLUMN_NAME_ID};
+        String sortOrder = DbContract.TaskTable.COLUMN_NAME_DATE_REMINDER + " ASC";
+        String selection = DbContract.TaskTable.COLUMN_NAME_ARCHIVED + "=? ";
+        String[] selectionArgs = {"0"};
+        Cursor cursor = db.query(DbContract.TaskTable.TABLE_NAME, projection, selection,
+                selectionArgs, null, null, sortOrder);
+        return cursor;
+    }
+
+    private static List<Task> mergeListsOnReminderDate(List<Task> orderedTaskList, List<Task> emptyReminderTaskList) {
+        List<Task> mergedTaskList = new ArrayList<Task>();
+        int index = 0;
+
+        //12:00 am of currentday
+        long currentDayTimestamp = getCurrentDate();
+
+        for (Task orderedTask : orderedTaskList) {
+
+            //Ordered tasks at 12:00 am on current date will appear after empty reminders
+            if (orderedTask.getDateReminder() >= currentDayTimestamp) {
+                mergedTaskList.addAll(emptyReminderTaskList);
+                emptyReminderTaskList = null;
+                break;
+            }
+            mergedTaskList.add(orderedTask);
+            index++;
+        }
+        if (emptyReminderTaskList != null)
+            mergedTaskList.addAll(emptyReminderTaskList);
+        mergedTaskList.addAll(orderedTaskList.subList(index, orderedTaskList.size()));
+        return mergedTaskList;
     }
 
     /**
@@ -189,7 +331,7 @@ public class Task extends Model implements DbContract {
         Hashtag[] hashtagList = new Hashtag[cursor.getCount()];
         int count = 0;
         while (cursor.moveToNext()) {
-            Hashtag hashtag = new HashtagBuilder().withDb(db).build();
+            Hashtag hashtag = new Hashtag();
             hashtag.setHashtagId(cursor.getInt(cursor
                     .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_ID)));
             hashtag.getModelFromDb();
@@ -203,7 +345,7 @@ public class Task extends Model implements DbContract {
         hashtags.addAll(getHashtagList(taskDetails));
         hashtags.addAll(getHashtagList(taskTitle));
         for (String hashtag : hashtags) {
-            Hashtag hashtagObject = new HashtagBuilder().withLabel(hashtag).withTaskId(taskId).withDb(db).build();
+            Hashtag hashtagObject = new HashtagBuilder().withLabel(hashtag).withTaskId(taskId).build();
             hashtagObject.setModelInDb();
         }
     }
@@ -319,7 +461,7 @@ public class Task extends Model implements DbContract {
             for (String newHashtag : newHashtagList) {
                 // if newhashtags don't exist, create them
                 if (!doesValueExistInHashtagList(newHashtag)) {
-                    Hashtag hashtag = new HashtagBuilder().withLabel(newHashtag).withTaskId(taskId).withDb(db).build();
+                    Hashtag hashtag = new HashtagBuilder().withLabel(newHashtag).withTaskId(taskId).build();
                     hashtag.setModelInDb();
                 }
             }
@@ -328,7 +470,7 @@ public class Task extends Model implements DbContract {
 
     private boolean doesValueExistInHashtagList(String value) {
         Hashtag[] array = getHashtagArray();
-        if(array == null)
+        if (array == null)
             return false;
         for (Hashtag oldHashtag : array) {
             if (oldHashtag.getLabel().equals(value)) {

@@ -1,6 +1,7 @@
 package com.ac.tdl.adapter;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -9,7 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.ac.tdl.EditActivityListener;
+import com.ac.tdl.EditActivity;
+import com.ac.tdl.HomeFragment;
 import com.ac.tdl.R;
 import com.ac.tdl.model.Task;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
@@ -21,30 +23,34 @@ import java.util.List;
 /**
  * Created by chrisjluc on 2014-05-25.
  */
-public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> implements AdapterView.OnItemClickListener{
+public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> implements AdapterView.OnItemClickListener,
+        ContextualUndoAdapter.DeleteItemCallback {
 
-    private Context context;
-    private HashMap<String, ContextualUndoAdapter> adapterHashmap;
-    private List<String> headerList;
-    private HashMap<String,List<Task>> tasksmap;
-    private EditActivityListener editactivityListener;
+    private Activity homeActivity;
+    private HashMap<String, ContextualUndoAdapter> adapterByHeader;
+    private HashMap<String, List<Task>> tasksByHeader;
 
-    public ExpandableTaskAdapter(Context context, List<String> headerList, HashMap<String,
-            List<Task>> tasksmap, HashMap<String, ContextualUndoAdapter> adapterHashmap, EditActivityListener editactivityListener) {
+    public ExpandableTaskAdapter(Activity activity, List<String> headerList, HashMap<String, List<Task>> tasksByHeader) {
 
-        super(context, R.layout.expandable_item, R.id.header_layout, R.id.content_layout,headerList);
-        this.context = context;
-        this.headerList = headerList;
-        this.tasksmap = tasksmap;
-        this.adapterHashmap = adapterHashmap;
-        this.editactivityListener = editactivityListener;
+        super(activity, R.layout.expandable_item, R.id.header_layout, R.id.content_layout, headerList);
+        this.homeActivity = activity;
+        this.tasksByHeader = tasksByHeader;
+        adapterByHeader = new HashMap<String, ContextualUndoAdapter>();
+
+        for (String header : headerList) {
+            List<Task> taskList = tasksByHeader.get(header);
+            TaskAdapter taskAdapter = new TaskAdapter(activity, taskList);
+            ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
+                    R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
+            adapterByHeader.put(header, adapter);
+        }
     }
 
     @Override
     public View getTitleView(int i, View convertView, ViewGroup viewGroup) {
         View view = convertView;
-        if(view == null){
-            LayoutInflater vi = LayoutInflater.from(context);
+        if (view == null) {
+            LayoutInflater vi = LayoutInflater.from(homeActivity);
             view = vi.inflate(R.layout.header_item, null);
         }
         TextView tvHeader = (TextView) view.findViewById(R.id.tvHeader);
@@ -57,15 +63,14 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     public View getContentView(int i, View convertView, ViewGroup viewGroup) {
         View view = convertView;
         if (view == null) {
-            LayoutInflater vi = LayoutInflater.from(context);
+            LayoutInflater vi = LayoutInflater.from(homeActivity);
             view = vi.inflate(R.layout.content_item, null);
         }
         ListView listview = (ListView) view.findViewById(R.id.lvNestedTasks);
-        ContextualUndoAdapter adapter = adapterHashmap.get(getItem(i));
+        ContextualUndoAdapter adapter = adapterByHeader.get(getItem(i));
         if (adapter == null || listview == null)
             return view;
         adapter.setAbsListView(listview);
-
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
         setListViewHeightBasedOnChildren(listview, adapter);
@@ -90,8 +95,30 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         int parentId = parent.getId();
-        List<Task> associatedTasks = tasksmap.get(getItem(parentId));
+        List<Task> associatedTasks = tasksByHeader.get(getItem(parentId));
         Task task = associatedTasks.get(position);
-        editactivityListener.startActivityFromHomeActivity(task.getTaskId());
+        Intent intent = new Intent(homeActivity, EditActivity.class);
+        intent.putExtra("taskId", task.getTaskId());
+        homeActivity.startActivityForResult(intent, HomeFragment.EDIT_ACTIVITY);
+    }
+
+    @Override
+    public void deleteItem(int position, View view) {
+        View parent = (View) view.getParent();
+        int parentId = parent.getId();
+        List<Task> associatedTasks = tasksByHeader.get(getItem(parentId));
+        Task task = associatedTasks.get(position);
+        associatedTasks.remove(position);
+        task.updateArchived(true);
+
+
+        TaskAdapter taskAdapter = (TaskAdapter) adapterByHeader.get(getItem(parentId)).getDecoratedBaseAdapter();
+        taskAdapter.remove(task);
+        taskAdapter.notifyDataSetChanged();
+    }
+
+    public void expandAll() {
+        for (int i = 0; i < tasksByHeader.size(); i++)
+            this.expand(i);
     }
 }

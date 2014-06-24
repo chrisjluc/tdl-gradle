@@ -3,6 +3,7 @@ package com.ac.tdl;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -15,22 +16,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.ac.tdl.adapter.DateArrayAdapter;
+import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.adapter.NavDrawerListAdapter;
-import com.ac.tdl.model.TdlDate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-
-import antistatic.spinnerwheel.AbstractWheel;
-import antistatic.spinnerwheel.OnWheelChangedListener;
-import antistatic.spinnerwheel.OnWheelClickedListener;
-import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
 public class MainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
@@ -113,11 +102,28 @@ public class MainActivity extends Activity {
             // on first time display view for first nav item
             displayView(0);
         }
+        //Set Instance
+        DbHelper.setInstance(this);
+    }
+
+    /*
+ *   Load task list
+ */
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1)
+            if (resultCode == this.RESULT_OK) {
+                boolean result = data.getBooleanExtra("isSaved", false);
+                int taskId = data.getIntExtra("taskId", -1);
+                if (result) {
+                    HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+                    fragment.loadTasks();
+                }
+            }
     }
 
     /**
      * Slide menu item click listener
-     * */
+     */
     private class SlideMenuClickListener implements
             ListView.OnItemClickListener {
         @Override
@@ -162,7 +168,7 @@ public class MainActivity extends Activity {
 
     /**
      * Diplaying fragment view for selected nav drawer list item
-     * */
+     */
     private void displayView(int position) {
         // update the main content by replacing fragments
         Fragment fragment = null;
@@ -195,9 +201,6 @@ public class MainActivity extends Activity {
             // error in creating fragment
             Log.e("MainActivity", "Error in creating fragment");
         }
-
-
-
 
 
     }

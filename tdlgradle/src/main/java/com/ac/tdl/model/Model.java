@@ -1,17 +1,31 @@
 package com.ac.tdl.model;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public abstract class Model {
 
 	public abstract void getModelFromDb();
 	public abstract void setModelInDb();
-	
-	protected long getCurrentTime() {
-		return Calendar.getInstance().getTimeInMillis();
-	}
-	
-	protected int getIntFromBool(boolean isTrue) {
+
+    protected static long getCurrentTime() {
+        return Calendar.getInstance().getTimeInMillis();
+    }
+
+    protected static long floorDateByDay(Calendar c) {
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTime().getTime();
+    }
+
+    protected static long getCurrentDate() {
+        Calendar c = new GregorianCalendar();
+        return floorDateByDay(c);
+    }
+
+	protected static int getIntFromBool(boolean isTrue) {
 		if (isTrue) {
 			return 1;
 		}

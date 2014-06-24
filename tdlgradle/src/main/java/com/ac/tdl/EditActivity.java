@@ -33,7 +33,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     public final static int TASK_TITLE_DIALOG = 0;
     public final static int TASK_DETAIL_DIALOG = 1;
     private Task task;
-    private SQLiteDatabase db;
+    private SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
     private TextView tvTaskTitle;
     private TextView tvTaskDetail;
     private TextView tvHashtags;
@@ -78,11 +78,10 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-        setupDatabase();
         Intent intent = getIntent();
         if (intent != null) {
             int taskId = intent.getIntExtra("taskId", 0);
-            task = new TaskBuilder().withDb(db).withTaskId(taskId).build();
+            task = new TaskBuilder().withTaskId(taskId).build();
             task.getModelFromDb();
         }
         setupViews();
@@ -129,12 +128,6 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    private void setupDatabase() {
-        DbHelper mDbHelper = DbHelper.getInstance(getBaseContext());
-        db = mDbHelper.getWritableDatabase();
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -177,12 +170,13 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.bEditSave:
                 task.setPriority(cbPriority.isChecked());
-                if(calendar != null)
+                if (calendar != null)
                     task.setDateReminder(calendar.getTimeInMillis());
                 task.updateModelInDb();
                 Intent saveIntent = new Intent();
-                saveIntent.putExtra("isSaved",true);
-                setResult(RESULT_OK,saveIntent);
+                saveIntent.putExtra("isSaved", true);
+                saveIntent.putExtra("taskId", task.getTaskId());
+                setResult(RESULT_OK, saveIntent);
                 finish();
                 break;
         }

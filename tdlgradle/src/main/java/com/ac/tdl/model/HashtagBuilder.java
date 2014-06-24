@@ -8,7 +8,6 @@ public class HashtagBuilder {
 	private long dateCreated;
 	private int taskId;
 	private boolean archived;
-	private SQLiteDatabase db;
 
 	public HashtagBuilder withHashtagId(int hashtagId) {
 		this.hashtagId = hashtagId;
@@ -35,12 +34,7 @@ public class HashtagBuilder {
 		return this;
 	}
 
-	public HashtagBuilder withDb(SQLiteDatabase db) {
-		this.db = db;
-		return this;
-	}
-
 	public Hashtag build() {
-		return new Hashtag(hashtagId, label, dateCreated, taskId, archived, db);
+		return new Hashtag(hashtagId, label, dateCreated, taskId, archived);
 	}
 }
