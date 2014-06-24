@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.14">
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.86"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:background="@drawable/layout_task_card"
         android:layout_above="@+id/rlAddBar">
-        <!--
-        android:background="@drawable/layout_task_card">
-        -->
 
         <ListView
             android:id="@+id/lvTasks"
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:dividerHeight="5dp"
-            android:divider="@color/bg_gray"></ListView>
+            android:divider="@color/bg_gray">
+        </ListView>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/rlAddBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,6 +67,6 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/ic_add_archive"
             android:focusable="true" />
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
