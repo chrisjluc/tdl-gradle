@@ -277,19 +277,6 @@ public class Task extends Model implements DbContract {
         return hashtags;
     }
 
-    /**
-     * Get hashtag labels from Hashtag objects in the hashtag array
-     *
-     * @return List<String>
-     */
-    public List<String> getHashtagLabels() {
-        List<String> hashtagLabels = new ArrayList<String>();
-        for (Hashtag hashtag : hashtagArray) {
-            hashtagLabels.add(hashtag.getLabel());
-        }
-        return hashtagLabels;
-    }
-
     public void updateTaskTitle(String taskTitle) {
         updateTask(taskId, taskTitle, TaskTable.COLUMN_NAME_TITLE);
         setTaskTitle(taskTitle);
@@ -468,7 +455,7 @@ public class Task extends Model implements DbContract {
         }
     }
 
-    private boolean doesValueExistInHashtagList(String value) {
+    public boolean doesValueExistInHashtagList(String value) {
         Hashtag[] array = getHashtagArray();
         if (array == null)
             return false;

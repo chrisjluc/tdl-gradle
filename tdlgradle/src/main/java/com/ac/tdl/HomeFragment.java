@@ -33,9 +33,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private EditText etTaskTitle;
     private ImageButton bAdd;
-    private SQLiteDatabase db;
-    private View parentView;
     private ListView lvTasks;
+    HashMap<String, List<Task>> tasksByHeader;
+    List<String> orderedHeaderList;
 
     public HomeFragment() {
     }
@@ -44,8 +44,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        parentView = rootView;
-        setUpViews();
+        setUpViews(rootView);
         loadTasks();
         return rootView;
     }
@@ -53,7 +52,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     /**
      * Called first to set up the layout
      */
-    private void setUpViews() {
+    private void setUpViews(View parentView) {
 
         etTaskTitle = (EditText) parentView.findViewById(R.id.etTaskTitle);
         etTaskTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -72,13 +71,39 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadTasks() {
-        List<String> orderedHeaderList = new ArrayList<String>();
-        HashMap<String, List<Task>> tasksByHeader = Task.getTasksByHeader(orderedHeaderList);
-        ExpandableTaskAdapter expandableAdapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
+        orderedHeaderList = new ArrayList<String>();
+        tasksByHeader = Task.getTasksByHeader(orderedHeaderList);
+        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
                 tasksByHeader);
-        expandableAdapter.setAbsListView(lvTasks);
-        lvTasks.setAdapter(expandableAdapter);
-        expandableAdapter.expandAll();
+        setAdapter(lvTasks, adapter);
+    }
+    public void loadTasks(String hashtag) {
+        HashMap<String, List<Task>> filteredTasks = new HashMap<String, List<Task>>();
+        List<String> headerList = new ArrayList<String>();
+        for(String header : orderedHeaderList) {
+            List<Task> tasks = tasksByHeader.get(header);
+            for(Task task : tasks){
+                if(task.doesValueExistInHashtagList(hashtag)){
+                    if(!filteredTasks.containsKey(header))
+                        filteredTasks.put(header,new ArrayList<Task>());
+                    if(!headerList.contains(header))
+                        headerList.add(header);
+                    filteredTasks.get(header).add(task);
+                }
+            }
+        }
+        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), headerList,
+                filteredTasks);
+        setAdapter(lvTasks, adapter);
+
+    }
+
+    private void setAdapter(ListView listview, ExpandableTaskAdapter adapter) {
+        listview.setAdapter(null);
+        adapter.setAbsListView(listview);
+        listview.setAdapter(adapter);
+        adapter.expandAll();
+
     }
 //TODO: smarter task load
     /**
@@ -86,8 +111,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      * @param taskId
      */
     public void loadTasks(int taskId){
-
     }
+
 
     @Override
     public void onClick(View v) {

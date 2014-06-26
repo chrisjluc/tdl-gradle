@@ -39,15 +39,17 @@ public class Hashtag extends Model implements DbContract {
 
     public Hashtag(){}
 
-    public static String[] getHashtagLabelsInDb() {
+    public static List<String> getHashtagLabelsInDb() {
         String[] projection = {DbContract.HashtagTable.COLUMN_NAME_HASHTAG_LABEL};
+        String selection = HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
+        String[] selectionArgs = new String[]{"0"};
         Cursor cursor = db.query(true, DbContract.HashtagTable.TABLE_NAME, projection,
-                null, null, null, null, null, null);
-        ArrayList<String> hashtagArray = new ArrayList<String>();
+                selection, selectionArgs, null, null, null, null);
+        List<String> hashtagList = new ArrayList<String>();
         while (cursor.moveToNext()) {
-            hashtagArray.add(cursor.getString(0));
+            hashtagList.add(cursor.getString(0));
         }
-        return hashtagArray.toArray(new String[hashtagArray.size()]);
+        return hashtagList;
     }
 
 	@Override

@@ -18,8 +18,10 @@ import android.widget.ListView;
 
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.adapter.NavDrawerListAdapter;
+import com.ac.tdl.model.Hashtag;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
@@ -44,6 +46,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set Instance
+        DbHelper.setInstance(this);
+
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -60,10 +65,12 @@ public class MainActivity extends Activity {
         navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
-        // Home
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-        // Find People
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+
+        List<String> hashtagLabels = Hashtag.getHashtagLabelsInDb();
+        if(hashtagLabels != null)
+            for(String hashtag : hashtagLabels)
+                navDrawerItems.add(new NavDrawerItem(hashtag, navMenuIcons.getResourceId(1, -1)));
 
         // Recycle the typed array
         navMenuIcons.recycle();
@@ -100,10 +107,9 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState == null) {
             // on first time display view for first nav item
-            displayView(0);
+            displayView();
         }
-        //Set Instance
-        DbHelper.setInstance(this);
+
     }
 
     /*
@@ -170,42 +176,31 @@ public class MainActivity extends Activity {
      * Diplaying fragment view for selected nav drawer list item
      */
     private void displayView(int position) {
-        // update the main content by replacing fragments
-        Fragment fragment = null;
-        switch (position) {
-            case 0:
-                fragment = new HomeFragment();
-                break;
-            case 1:
-                fragment = new HashtagsFragment();
-                break;
-
-            default:
-                break;
-        }
-
-        Fragment calender = new CalendarFragment();
-        FragmentManager fragmentManager = getFragmentManager();
-
-        fragmentManager.beginTransaction().add(R.id.frame_calendar, calender).commit();
-
-        if (fragment != null) {
-            fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
-
-            // update selected item and title, then close the drawer
-            mDrawerList.setItemChecked(position, true);
-            mDrawerList.setSelection(position);
-            setTitle(navMenuTitles[position]);
-            mDrawerLayout.closeDrawer(mDrawerList);
-        } else {
-            // error in creating fragment
-            Log.e("MainActivity", "Error in creating fragment");
-        }
-
-
+        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        if(position == 0)
+            fragment.loadTasks();
+        else
+            fragment.loadTasks(navDrawerItems.get(position).getTitle());
+        mDrawerLayout.closeDrawer(mDrawerList);
     }
 
-    @Override
+    /**
+     * Diplaying fragment view for selected nav drawer list item
+     */
+    private void displayView() {
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        if (fragmentManager.findFragmentById(R.id.frame_calendar) == null) {
+            fragmentManager.beginTransaction().add(R.id.frame_calendar, new CalendarFragment()).commit();
+        }
+        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        if (fragment == null) {
+            fragmentManager.beginTransaction().add(R.id.frame_container, new HomeFragment()).commit();
+        }
+    }
+
+        @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getActionBar().setTitle(mTitle);
