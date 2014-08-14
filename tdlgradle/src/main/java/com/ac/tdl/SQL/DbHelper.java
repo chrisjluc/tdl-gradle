@@ -20,9 +20,13 @@ public class DbHelper extends SQLiteOpenHelper implements DbContract {
 
     private static DbHelper instance;
 
-    public static synchronized DbHelper getInstance(Context context) {
+    public static synchronized DbHelper setInstance(Context context) {
         if (instance == null)
             instance = new DbHelper(context);
+        return instance;
+    }
+
+    public static synchronized DbHelper getInstance() {
         return instance;
     }
 

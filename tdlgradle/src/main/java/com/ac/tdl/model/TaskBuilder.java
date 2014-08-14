@@ -16,7 +16,6 @@ public class TaskBuilder {
 
 	// Additional attributes
 	private Hashtag[] hashtagArray;
-	private SQLiteDatabase db;
 
 	public TaskBuilder withTaskId(int taskId) {
 		this.taskId = taskId;
@@ -74,14 +73,9 @@ public class TaskBuilder {
 		return this;
 	}
 
-	public TaskBuilder withDb(SQLiteDatabase db) {
-		this.db = db;
-		return this;
-	}
-
 	public Task build() {
 		return new Task(taskId, taskTitle, taskDetails, priority, dateCreated,
 				dateReminder, repetitionInMS, notifyBeforeReminderInMS,
-				isComplete, archived, hashtagArray, db);
+				isComplete, archived, hashtagArray);
 	}
 }
