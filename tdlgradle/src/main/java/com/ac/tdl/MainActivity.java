@@ -41,6 +41,10 @@ public class MainActivity extends Activity {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    // Fragments
+    private HomeFragment homeFragment;
+    private CalendarFragment calendarFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,10 +212,21 @@ public class MainActivity extends Activity {
         if (fragmentManager.findFragmentById(R.id.frame_calendar) == null) {
             fragmentManager.beginTransaction().add(R.id.frame_calendar, new CalendarFragment()).commit();
         }
-        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
-        if (fragment == null) {
+        if (getFragmentManager().findFragmentById(R.id.frame_container) == null) {
             fragmentManager.beginTransaction().add(R.id.frame_container, new HomeFragment()).commit();
         }
+    }
+
+    public HomeFragment getHomeFragment() {
+        if(homeFragment == null)
+            homeFragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        return homeFragment;
+    }
+
+    public CalendarFragment getCalendarFragment() {
+        if(calendarFragment == null)
+            calendarFragment = (CalendarFragment) getFragmentManager().findFragmentById(R.id.frame_calendar);
+        return calendarFragment;
     }
 
         @Override

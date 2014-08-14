@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.ac.tdl.EditActivity;
 import com.ac.tdl.HomeFragment;
+import com.ac.tdl.MainActivity;
 import com.ac.tdl.R;
 import com.ac.tdl.model.Task;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
@@ -26,20 +27,22 @@ import java.util.List;
 public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> implements AdapterView.OnItemClickListener,
         ContextualUndoAdapter.DeleteItemCallback {
 
-    private Activity homeActivity;
+    private MainActivity homeActivity;
     private HashMap<String, ContextualUndoAdapter> adapterByHeader;
     private HashMap<String, List<Task>> tasksByHeader;
+    private List<String> headerList;
 
     public ExpandableTaskAdapter(Activity activity, List<String> headerList, HashMap<String, List<Task>> tasksByHeader) {
 
         super(activity, R.layout.expandable_item, R.id.header_layout, R.id.content_layout, headerList);
-        this.homeActivity = activity;
+
+        this.homeActivity = (MainActivity) activity;
         this.tasksByHeader = tasksByHeader;
-        adapterByHeader = new HashMap<String, ContextualUndoAdapter>();
+        this.adapterByHeader = new HashMap<String, ContextualUndoAdapter>();
+        this.headerList = headerList;
 
         for (String header : headerList) {
-            List<Task> taskList = tasksByHeader.get(header);
-            TaskAdapter taskAdapter = new TaskAdapter(activity, taskList);
+            TaskAdapter taskAdapter = new TaskAdapter(activity, this.tasksByHeader.get(header));
             ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
                     R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
             adapterByHeader.put(header, adapter);
@@ -111,10 +114,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         associatedTasks.remove(position);
         task.updateArchived(true);
 
-
-        TaskAdapter taskAdapter = (TaskAdapter) adapterByHeader.get(getItem(parentId)).getDecoratedBaseAdapter();
-        taskAdapter.remove(task);
-        taskAdapter.notifyDataSetChanged();
+        homeActivity.getHomeFragment().loadTasks();
     }
 
     public void expandAll() {
