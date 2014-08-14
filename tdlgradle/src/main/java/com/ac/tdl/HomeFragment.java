@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.ac.tdl.adapter.ExpandableTaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private EditText etTaskTitle;
     private ImageButton bAdd;
     private ListView lvTasks;
+    private HashMap<Integer, List<Task>> tasksByParentId;
+
     HashMap<String, List<Task>> tasksByHeader;
     List<String> orderedHeaderList;
 
@@ -77,6 +80,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 tasksByHeader);
         setAdapter(lvTasks, adapter);
     }
+
     public void loadTasks(String hashtag) {
         HashMap<String, List<Task>> filteredTasks = new HashMap<String, List<Task>>();
         List<String> headerList = new ArrayList<String>();
@@ -92,6 +96,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 }
             }
         }
+
         ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), headerList,
                 filteredTasks);
         setAdapter(lvTasks, adapter);
@@ -135,6 +140,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         hideKeyboard(etTaskTitle);
 
         loadTasks();
+        ((MainActivity)getActivity()).updateDrawerList();
     }
 
     @SuppressWarnings("static-access")
