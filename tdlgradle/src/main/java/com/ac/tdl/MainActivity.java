@@ -1,13 +1,9 @@
 package com.ac.tdl;
 
-import com.ac.tdl.adapter.NavDrawerListAdapter;
-import com.ac.tdl.NavDrawerItem;
-
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -19,6 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.ac.tdl.SQL.DbHelper;
+import com.ac.tdl.adapter.NavDrawerListAdapter;
+import com.ac.tdl.model.Hashtag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
@@ -38,11 +41,51 @@ public class MainActivity extends Activity {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    // Fragments
+    private HomeFragment homeFragment;
+    private CalendarFragment calendarFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Set Instance
+        DbHelper.setInstance(this);
+
+
+        updateDrawerList();
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_drawer, //nav menu toggle icon
+                R.string.app_name, // nav drawer open - description for accessibility
+                R.string.app_name // nav drawer close - description for accessibility
+        ) {
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+                // calling onPrepareOptionsMenu() to show action bar icons
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle("");
+                // calling onPrepareOptionsMenu() to hide action bar icons
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState == null) {
+            // on first time display view for first nav item
+            displayView();
+        }
+
+    }
+
+    /*
+     *  Load drawer list
+     */
+    public void updateDrawerList() {
         mTitle = mDrawerTitle = getTitle();
 
         // load slide menu items
@@ -58,13 +101,9 @@ public class MainActivity extends Activity {
         navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
-        // Home
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-        // Find People
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-        // Photos
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 
+        updateHashtagList();
 
         // Recycle the typed array
         navMenuIcons.recycle();
@@ -79,35 +118,37 @@ public class MainActivity extends Activity {
         // enabling action bar app icon and behaving it as toggle button
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+    }
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.drawable.ic_drawer, //nav menu toggle icon
-                R.string.app_name, // nav drawer open - description for accessibility
-                R.string.app_name // nav drawer close - description for accessibility
-        ) {
-            public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
-                // calling onPrepareOptionsMenu() to show action bar icons
-                invalidateOptionsMenu();
+    /*
+    *   Load hashtag list
+    */
+    public void updateHashtagList() {
+        List<String> hashtagLabels = Hashtag.getHashtagLabelsInDb();
+        if(hashtagLabels != null)
+            for(String hashtag : hashtagLabels)
+                navDrawerItems.add(new NavDrawerItem(hashtag, navMenuIcons.getResourceId(1, -1)));
+    }
+
+    /*
+    *   Load task list
+    */
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1)
+            if (resultCode == this.RESULT_OK) {
+                boolean result = data.getBooleanExtra("isSaved", false);
+                int taskId = data.getIntExtra("taskId", -1);
+                if (result) {
+                    HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+                    fragment.loadTasks();
+                    updateDrawerList();
+                }
             }
-
-            public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
-                // calling onPrepareOptionsMenu() to hide action bar icons
-                invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        if (savedInstanceState == null) {
-            // on first time display view for first nav item
-            displayView(0);
-        }
     }
 
     /**
      * Slide menu item click listener
-     * */
+     */
     private class SlideMenuClickListener implements
             ListView.OnItemClickListener {
         @Override
@@ -152,42 +193,44 @@ public class MainActivity extends Activity {
 
     /**
      * Diplaying fragment view for selected nav drawer list item
-     * */
+     */
     private void displayView(int position) {
-        // update the main content by replacing fragments
-        Fragment fragment = null;
-        switch (position) {
-            case 0:
-                fragment = new HomeFragment();
-                break;
-            case 1:
-                fragment = new HashtagsFragment();
-                break;
-            case 2:
-                fragment = new SettingFragment();
-                break;
+        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        if(position == 0)
+            fragment.loadTasks();
+        else
+            fragment.loadTasks(navDrawerItems.get(position).getTitle());
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
 
-            default:
-                break;
+    /**
+     * Diplaying fragment view for selected nav drawer list item
+     */
+    private void displayView() {
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        if (fragmentManager.findFragmentById(R.id.frame_calendar) == null) {
+            fragmentManager.beginTransaction().add(R.id.frame_calendar, new CalendarFragment()).commit();
         }
-
-        if (fragment != null) {
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.frame_container, fragment).commit();
-
-            // update selected item and title, then close the drawer
-            mDrawerList.setItemChecked(position, true);
-            mDrawerList.setSelection(position);
-            setTitle(navMenuTitles[position]);
-            mDrawerLayout.closeDrawer(mDrawerList);
-        } else {
-            // error in creating fragment
-            Log.e("MainActivity", "Error in creating fragment");
+        if (getFragmentManager().findFragmentById(R.id.frame_container) == null) {
+            fragmentManager.beginTransaction().add(R.id.frame_container, new HomeFragment()).commit();
         }
     }
 
-    @Override
+    public HomeFragment getHomeFragment() {
+        if(homeFragment == null)
+            homeFragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        return homeFragment;
+    }
+
+    public CalendarFragment getCalendarFragment() {
+        if(calendarFragment == null)
+            calendarFragment = (CalendarFragment) getFragmentManager().findFragmentById(R.id.frame_calendar);
+        return calendarFragment;
+    }
+
+        @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getActionBar().setTitle(mTitle);
