@@ -34,7 +34,7 @@ public class Task extends Model implements DbContract {
     // Additional attributes
     private Hashtag[] hashtagArray;
 
-    private static final String INCOMPLETE = "incomplete";
+    private static final String INCOMPLETE = "Incomplete";
     private static final String TODAY = "Today";
     private static SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
 
@@ -224,9 +224,8 @@ public class Task extends Model implements DbContract {
                 TaskTable.COLUMN_NAME_IS_COMPLETE,
                 TaskTable.COLUMN_NAME_ARCHIVED};
         String selection = TaskTable.COLUMN_NAME_ID + "=? ";
-        String[] selectionArgs = null;
         try {
-            selectionArgs = new String[]{String.valueOf(taskId)};
+            String[] selectionArgs = new String[]{String.valueOf(taskId)};
             Cursor cursor = db.query(TaskTable.TABLE_NAME, projection,
                     selection, selectionArgs, null, null, null);
             cursor.moveToFirst();
@@ -272,21 +271,11 @@ public class Task extends Model implements DbContract {
      * @return List<String>
      */
     public List<String> getHashtagsLabelsFromUpdatedFields() {
-        List<String> hashtags = getHashtagList(taskDetails);
-        hashtags.addAll(getHashtagList(taskTitle));
+        List<String> hashtags = getHashtagListFromString(taskDetails);
+        hashtags.addAll(getHashtagListFromString(taskTitle));
+        if (hashtags.isEmpty())
+            return null;
         return hashtags;
-    }
-
-    public void updateTaskTitle(String taskTitle) {
-        updateTask(taskId, taskTitle, TaskTable.COLUMN_NAME_TITLE);
-        setTaskTitle(taskTitle);
-        updateHashtagIfChanged();
-    }
-
-    public void updateTaskDetails(String taskDetails) {
-        updateTask(taskId, taskDetails, TaskTable.COLUMN_NAME_DETAILS);
-        setTaskDetails(taskDetails);
-        updateHashtagIfChanged();
     }
 
     public void updateIsComplete(boolean isComplete) {
@@ -298,89 +287,10 @@ public class Task extends Model implements DbContract {
     public void updateArchived(boolean archived) {
         updateTask(taskId, archived, TaskTable.COLUMN_NAME_ARCHIVED);
         setArchived(archived);
-        getHashtagArrayFromDb();
         if (hashtagArray == null || archived == false) return;
         for (Hashtag hashtag : hashtagArray) {
             hashtag.archiveHashtag();
         }
-    }
-
-    private void getHashtagArrayFromDb() {
-        String[] projection = {HashtagTable.COLUMN_NAME_ID};
-        String selection = HashtagTable.COLUMN_NAME_TASK_ID + "=? AND "
-                + HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
-        String[] selectionArgs = {String.valueOf(taskId), "0"};
-        Cursor cursor = db.query(HashtagTable.TABLE_NAME, projection,
-                selection, selectionArgs, null, null, null);
-        if (cursor.getCount() == 0) {
-            return;
-        }
-        Hashtag[] hashtagList = new Hashtag[cursor.getCount()];
-        int count = 0;
-        while (cursor.moveToNext()) {
-            Hashtag hashtag = new Hashtag();
-            hashtag.setHashtagId(cursor.getInt(cursor
-                    .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_ID)));
-            hashtag.getModelFromDb();
-            hashtagList[count++] = hashtag;
-        }
-        hashtagArray = hashtagList;
-    }
-
-    private void saveHashtagList() {
-        List<String> hashtags = new ArrayList<String>();
-        hashtags.addAll(getHashtagList(taskDetails));
-        hashtags.addAll(getHashtagList(taskTitle));
-        for (String hashtag : hashtags) {
-            Hashtag hashtagObject = new HashtagBuilder().withLabel(hashtag).withTaskId(taskId).build();
-            hashtagObject.setModelInDb();
-        }
-    }
-
-    @Override
-    public void setModelInDb() {
-        if (dateCreated == 0) {
-            dateCreated = getCurrentTime();
-        }
-        ContentValues taskValues = new ContentValues();
-        taskValues.put(TaskTable.COLUMN_NAME_TITLE, taskTitle);
-        taskValues.put(TaskTable.COLUMN_NAME_DETAILS, taskDetails);
-        taskValues
-                .put(TaskTable.COLUMN_NAME_PRIORITY, getIntFromBool(priority));
-        taskValues.put(TaskTable.COLUMN_NAME_DATE_CREATED, dateCreated);
-        taskValues.put(TaskTable.COLUMN_NAME_DATE_REMINDER, dateReminder);
-        taskValues.put(TaskTable.COLUMN_NAME_REPETITION_MS, repetitionInMS);
-        taskValues.put(TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS,
-                notifyBeforeReminderInMS);
-        taskValues.put(TaskTable.COLUMN_NAME_IS_COMPLETE,
-                getIntFromBool(isComplete));
-        taskValues
-                .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
-        taskId = (int) db.insert(TaskTable.TABLE_NAME, null, taskValues);
-    }
-
-    public void updateModelInDb() {
-        if (dateCreated == 0) {
-            dateCreated = getCurrentTime();
-        }
-        ContentValues taskValues = new ContentValues();
-        taskValues.put(TaskTable.COLUMN_NAME_TITLE, taskTitle);
-        taskValues.put(TaskTable.COLUMN_NAME_DETAILS, taskDetails);
-        taskValues
-                .put(TaskTable.COLUMN_NAME_PRIORITY, getIntFromBool(priority));
-        taskValues.put(TaskTable.COLUMN_NAME_DATE_CREATED, dateCreated);
-        taskValues.put(TaskTable.COLUMN_NAME_DATE_REMINDER, dateReminder);
-        taskValues.put(TaskTable.COLUMN_NAME_REPETITION_MS, repetitionInMS);
-        taskValues.put(TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS,
-                notifyBeforeReminderInMS);
-        taskValues.put(TaskTable.COLUMN_NAME_IS_COMPLETE,
-                getIntFromBool(isComplete));
-        taskValues
-                .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
-        String selection = TaskTable.COLUMN_NAME_ID + "=? ";
-        String[] selectionArgs = {String.valueOf(taskId)};
-        db.update(TaskTable.TABLE_NAME, taskValues, selection, selectionArgs);
-        updateHashtagIfChanged();
     }
 
     /**
@@ -405,11 +315,101 @@ public class Task extends Model implements DbContract {
         db.update(TaskTable.TABLE_NAME, values, selection, selectionArgs);
     }
 
+    private void getHashtagArrayFromDb() {
+        String[] projection = {HashtagTable.COLUMN_NAME_ID};
+        String selection = HashtagTable.COLUMN_NAME_TASK_ID + "=? AND "
+                + HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
+        String[] selectionArgs = {String.valueOf(taskId), "0"};
+        Cursor cursor = db.query(HashtagTable.TABLE_NAME, projection,
+                selection, selectionArgs, null, null, null);
+        if (cursor.getCount() == 0) {
+            return;
+        }
+        Hashtag[] hashtagList = new Hashtag[cursor.getCount()];
+        int count = 0;
+        while (cursor.moveToNext()) {
+            Hashtag hashtag = new Hashtag();
+            hashtag.setHashtagId(cursor.getInt(cursor
+                    .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_ID)));
+            hashtag.getModelFromDb();
+            hashtagList[count++] = hashtag;
+        }
+        setHashtagArray(hashtagList);
+    }
+
+    private void saveHashtagList() {
+        List<String> hashtags = new ArrayList<String>();
+        hashtags.addAll(getHashtagListFromString(taskDetails));
+        hashtags.addAll(getHashtagListFromString(taskTitle));
+        if(hashtags.isEmpty())
+            return;
+        List<Hashtag> hashtagObjectList = new ArrayList<Hashtag>();
+
+        for (String hashtag : hashtags) {
+            Hashtag hashtagObject = new HashtagBuilder().withLabel(hashtag).withTaskId(taskId).build();
+            hashtagObject.setModelInDb();
+            hashtagObjectList.add(hashtagObject);
+        }
+        setHashtagArray(hashtagObjectList.toArray(new Hashtag[hashtags.size()]));
+    }
+
+    @Override
+    public void setModelInDb() {
+        if (dateCreated == 0) {
+            dateCreated = getCurrentTime();
+        }
+        ContentValues taskValues = new ContentValues();
+        taskValues.put(TaskTable.COLUMN_NAME_TITLE, taskTitle);
+        taskValues.put(TaskTable.COLUMN_NAME_DETAILS, taskDetails);
+        taskValues
+                .put(TaskTable.COLUMN_NAME_PRIORITY, getIntFromBool(priority));
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_CREATED, dateCreated);
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_REMINDER, dateReminder);
+        taskValues.put(TaskTable.COLUMN_NAME_REPETITION_MS, repetitionInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS,
+                notifyBeforeReminderInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_IS_COMPLETE,
+                getIntFromBool(isComplete));
+        taskValues
+                .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
+        int id = (int) db.insert(TaskTable.TABLE_NAME, null, taskValues);
+        setTaskId(id);
+    }
+
+    public void updateModel() {
+        updateModelInDb();
+        updateHashtagIfChanged();
+        getHashtagArrayFromDb();
+    }
+
+    private void updateModelInDb() {
+        if (dateCreated == 0) {
+            dateCreated = getCurrentTime();
+        }
+        ContentValues taskValues = new ContentValues();
+        taskValues.put(TaskTable.COLUMN_NAME_TITLE, taskTitle);
+        taskValues.put(TaskTable.COLUMN_NAME_DETAILS, taskDetails);
+        taskValues
+                .put(TaskTable.COLUMN_NAME_PRIORITY, getIntFromBool(priority));
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_CREATED, dateCreated);
+        taskValues.put(TaskTable.COLUMN_NAME_DATE_REMINDER, dateReminder);
+        taskValues.put(TaskTable.COLUMN_NAME_REPETITION_MS, repetitionInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS,
+                notifyBeforeReminderInMS);
+        taskValues.put(TaskTable.COLUMN_NAME_IS_COMPLETE,
+                getIntFromBool(isComplete));
+        taskValues
+                .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
+        String selection = TaskTable.COLUMN_NAME_ID + "=? ";
+        String[] selectionArgs = {String.valueOf(taskId)};
+        db.update(TaskTable.TABLE_NAME, taskValues, selection, selectionArgs);
+    }
+
     /**
      * @param input
      * @return Array of valid hashtags
      */
-    private List<String> getHashtagList(String input) {
+    private List<String> getHashtagListFromString(String input) {
         ArrayList<String> hashtagList = new ArrayList<String>();
         if (input == null || input.isEmpty()) return hashtagList;
         Pattern pattern = Pattern
@@ -445,13 +445,16 @@ public class Task extends Model implements DbContract {
             }
         }
         if (newHashtagList != null) {
+            List<Hashtag> hashtagObjectList = new ArrayList<Hashtag>();
             for (String newHashtag : newHashtagList) {
                 // if newhashtags don't exist, create them
                 if (!doesValueExistInHashtagList(newHashtag)) {
                     Hashtag hashtag = new HashtagBuilder().withLabel(newHashtag).withTaskId(taskId).build();
                     hashtag.setModelInDb();
+                    hashtagObjectList.add(hashtag);
                 }
             }
+            setHashtagArray(hashtagObjectList.toArray(new Hashtag[newHashtagList.size()]));
         }
     }
 
@@ -499,16 +502,15 @@ public class Task extends Model implements DbContract {
         this.dateCreated = dateCreated;
     }
 
-    /**
-     * Queries for hashtags if hashtag array is null
-     *
-     * @return hashtag array
-     */
-    public Hashtag[] getHashtagArray() {
-        if (hashtagArray == null) {
-            getHashtagArrayFromDb();
-        }
-        return hashtagArray;
+    public Hashtag[] getHashtagArray() { return this.hashtagArray; }
+
+    public List<String> getHashtagLabelsList() {
+        if (hashtagArray == null)
+            return null;
+        List<String> list = new ArrayList<String>();
+        for (Hashtag h : hashtagArray)
+        list.add(h.getLabel());
+        return list;
     }
 
     public void setHashtagArray(Hashtag[] hashtagArray) {

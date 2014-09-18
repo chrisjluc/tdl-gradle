@@ -97,7 +97,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         tvTaskDetail.setText(task.getTaskDetails());
 
         tvHashtags = (TextView) findViewById(R.id.tvEditHashtags);
-        String hashtagString = Hashtag.createHashtagString(task.getHashtagArray());
+        String hashtagString = Hashtag.createHashtagString(task.getHashtagLabelsList());
         tvHashtags.setText(hashtagString);
 
         cbPriority = (CheckBox) findViewById(R.id.cbEditPriority);
@@ -172,7 +172,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 task.setPriority(cbPriority.isChecked());
                 if (calendar != null)
                     task.setDateReminder(calendar.getTimeInMillis());
-                task.updateModelInDb();
+                task.updateModel();
                 Intent saveIntent = new Intent();
                 saveIntent.putExtra("isSaved", true);
                 saveIntent.putExtra("taskId", task.getTaskId());

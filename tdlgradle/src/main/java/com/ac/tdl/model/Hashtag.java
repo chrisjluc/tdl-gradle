@@ -61,16 +61,10 @@ public class Hashtag extends Model implements DbContract {
 				};
 		String selection = HashtagTable.COLUMN_NAME_ID + "=? AND "
 				+ HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
-		String[] selectionArgs = null;
-		Cursor cursor = null;
 		try {
-			selectionArgs = new String[] { String.valueOf(hashtagId), "0" };
-			cursor = db.query(HashtagTable.TABLE_NAME, projection, selection,
+            String[] selectionArgs = new String[] { String.valueOf(hashtagId), "0" };
+            Cursor cursor = db.query(HashtagTable.TABLE_NAME, projection, selection,
 					selectionArgs, null, null, null);
-
-			if (cursor.getCount() == 0) {
-				return;
-			}
 			cursor.moveToFirst();
 			setLabel(cursor
 					.getString(cursor
@@ -86,18 +80,7 @@ public class Hashtag extends Model implements DbContract {
 			Log.d("Exception", e.toString());
 		}
 	}
-   public static String createHashtagString(Hashtag[] array){
-            StringBuilder hashtagBuilder = new StringBuilder();
 
-            if (array == null) {
-                return "";
-            }
-
-            for (Hashtag hashtag : array){
-                hashtagBuilder.append(" #" + hashtag.getLabel());
-            }
-            return hashtagBuilder.toString();
-        }
     public static String createHashtagString(List<String> array){
         StringBuilder hashtagBuilder = new StringBuilder();
 
@@ -121,7 +104,8 @@ public class Hashtag extends Model implements DbContract {
 		hashtagValues.put(HashtagTable.COLUMN_NAME_DATE_CREATED, dateCreated);
 		hashtagValues.put(HashtagTable.COLUMN_NAME_TASK_ID, taskId);
 		hashtagValues.put(HashtagTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
-		db.insert(HashtagTable.TABLE_NAME, null, hashtagValues);
+		int id = (int) db.insert(HashtagTable.TABLE_NAME, null, hashtagValues);
+        setHashtagId(id);
 	}
 
 	public void archiveHashtag() {

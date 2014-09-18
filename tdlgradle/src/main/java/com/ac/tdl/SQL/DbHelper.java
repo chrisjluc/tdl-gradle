@@ -20,13 +20,18 @@ public class DbHelper extends SQLiteOpenHelper implements DbContract {
 
     private static DbHelper instance;
 
-    public static synchronized DbHelper setInstance(Context context) {
-        if (instance == null)
-            instance = new DbHelper(context);
-        return instance;
+    public static synchronized DbHelper getInstance() {
+        return getInstance(null);
     }
 
-    public static synchronized DbHelper getInstance() {
+    /**
+     * Used to initialize the dbhelper, never has to be called again after
+     * @param context
+     * @return
+     */
+    public static synchronized DbHelper getInstance(Context context) {
+        if (instance == null && context != null)
+            instance = new DbHelper(context);
         return instance;
     }
 
@@ -36,6 +41,7 @@ public class DbHelper extends SQLiteOpenHelper implements DbContract {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         String HASHTAG_TABLE_CREATE = "CREATE TABLE " + HashtagTable.TABLE_NAME
                 + " (" + HashtagTable.COLUMN_NAME_ID + PRIMARY_KEY
                 + HashtagTable.COLUMN_NAME_HASHTAG_LABEL + varchar(48)
@@ -85,9 +91,34 @@ public class DbHelper extends SQLiteOpenHelper implements DbContract {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    /**
+     * Used for testing
+     */
+    public void create() {
+        String SQL_DELETE_HASHTAG = "DROP TABLE IF EXISTS "
+                + HashtagTable.TABLE_NAME;
+        String SQL_DELETE_TASK = "DROP TABLE IF EXISTS " + TaskTable.TABLE_NAME;
+
+        Log.i(SQL_DELETE, SQL_DELETE_HASHTAG);
+        Log.i(SQL_DELETE, SQL_DELETE_TASK);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(SQL_DELETE_HASHTAG);
+        db.execSQL(SQL_DELETE_TASK);
+        onCreate(db);
+    }
+
+    /**
+     * Used for testing
+     */
+    public void clear()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(HashtagTable.TABLE_NAME, null, null);
+        db.delete(TaskTable.TABLE_NAME, null, null);
+    }
     private String varchar(int size) {
         return VARCHAR + "(" + size + ")";
-
     }
 
 }
