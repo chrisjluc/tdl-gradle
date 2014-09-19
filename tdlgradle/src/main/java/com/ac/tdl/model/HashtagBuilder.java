@@ -1,15 +1,13 @@
 package com.ac.tdl.model;
 
-import android.database.sqlite.SQLiteDatabase;
-
 public class HashtagBuilder {
-	private int hashtagId;
+	private long hashtagId = -1;
 	private String label;
 	private long dateCreated;
-	private int taskId;
+	private long taskId = -1;
 	private boolean archived;
 
-	public HashtagBuilder withHashtagId(int hashtagId) {
+	public HashtagBuilder withHashtagId(long hashtagId) {
 		this.hashtagId = hashtagId;
 		return this;
 	}
@@ -24,7 +22,7 @@ public class HashtagBuilder {
 		return this;
 	}
 
-	public HashtagBuilder withTaskId(int taskId) {
+	public HashtagBuilder withTaskId(long taskId) {
 		this.taskId = taskId;
 		return this;
 	}

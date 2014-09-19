@@ -1,9 +1,7 @@
 package com.ac.tdl.model;
 
-import android.database.sqlite.SQLiteDatabase;
-
 public class TaskBuilder {
-	private int taskId;
+	private long taskId = -1;
 	private String taskTitle;
 	private String taskDetails;
 	private boolean priority;
@@ -17,7 +15,7 @@ public class TaskBuilder {
 	// Additional attributes
 	private Hashtag[] hashtagArray;
 
-	public TaskBuilder withTaskId(int taskId) {
+	public TaskBuilder withTaskId(long taskId) {
 		this.taskId = taskId;
 		return this;
 	}

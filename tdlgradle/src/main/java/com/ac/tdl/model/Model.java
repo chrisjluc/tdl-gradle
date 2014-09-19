@@ -5,7 +5,6 @@ import java.util.GregorianCalendar;
 
 public abstract class Model {
 
-	public abstract void getModelFromDb();
 	public abstract void setModelInDb();
 
     protected static long getCurrentTime() {

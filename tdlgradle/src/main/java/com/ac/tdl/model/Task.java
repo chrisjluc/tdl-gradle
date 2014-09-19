@@ -3,16 +3,11 @@ package com.ac.tdl.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ac.tdl.SQL.DbContract;
 import com.ac.tdl.SQL.DbHelper;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +15,7 @@ import java.util.regex.Pattern;
 public class Task extends Model implements DbContract {
 
     // Stored in SQL
-    private int taskId;
+    private long taskId;
     private String taskTitle;
     private String taskDetails;
     private boolean priority;
@@ -53,7 +48,7 @@ public class Task extends Model implements DbContract {
      * @param archived
      * @param hashtagArray
      */
-    public Task(int taskId, String taskTitle, String taskDetails,
+    public Task(long taskId, String taskTitle, String taskDetails,
                 boolean priority, long dateCreated, long dateReminder,
                 long repetitionInMS, long notifyBeforeReminderInMS,
                 boolean isComplete, boolean archived, Hashtag[] hashtagArray) {
@@ -75,7 +70,7 @@ public class Task extends Model implements DbContract {
 
     public Task() {
     }
-
+/*
     public static HashMap<String, List<Task>> getTasksByHeader(List<String> headers) {
         HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
 
@@ -153,7 +148,7 @@ public class Task extends Model implements DbContract {
      *
      * @return tasksList
      */
-    public static List<Task> getTasksList() {
+    /*public static List<Task> getTasksList() {
         Cursor cursor = getUnarchivedTaskIds();
         List<Task> orderedTaskList = new ArrayList<Task>();
         List<Task> emptyReminderTaskList = new ArrayList<Task>();
@@ -212,9 +207,8 @@ public class Task extends Model implements DbContract {
 
     /**
      * Constructor with at least the taskId, for this method to run
-     */
-    @Override
-    public void getModelFromDb() {
+     **/
+    /*public void getModelFromDb() {
         String[] projection = {TaskTable.COLUMN_NAME_TITLE,
                 TaskTable.COLUMN_NAME_DETAILS, TaskTable.COLUMN_NAME_PRIORITY,
                 TaskTable.COLUMN_NAME_DATE_CREATED,
@@ -255,8 +249,11 @@ public class Task extends Model implements DbContract {
             Log.d("Exception", e.toString());
         }
     }
+*/
 
     /**
+     * SHOULD ONLY BE CALLED BY TASK MANAGER
+     *
      * Saves task into database, and parses out the hashtags and saves them in
      * the db
      */
@@ -278,7 +275,7 @@ public class Task extends Model implements DbContract {
         return hashtags;
     }
 
-    public void updateIsComplete(boolean isComplete) {
+    /*public void updateIsComplete(boolean isComplete) {
         updateTask(taskId, isComplete, TaskTable.COLUMN_NAME_IS_COMPLETE);
         setComplete(isComplete);
         //TODO : archive hashtags, when iscompleted is undone bring the hashtags back
@@ -301,7 +298,7 @@ public class Task extends Model implements DbContract {
      * @param value
      * @param columnName
      */
-    private void updateTask(int taskId, Object value, String columnName) {
+   /* private void updateTask(long taskId, Object value, String columnName) {
         ContentValues values = new ContentValues();
 
         if (value instanceof String) {
@@ -313,7 +310,7 @@ public class Task extends Model implements DbContract {
         String selection = TaskTable.COLUMN_NAME_ID + "=? ";
         String[] selectionArgs = {String.valueOf(taskId)};
         db.update(TaskTable.TABLE_NAME, values, selection, selectionArgs);
-    }
+    }*/
 
     private void getHashtagArrayFromDb() {
         String[] projection = {HashtagTable.COLUMN_NAME_ID};
@@ -341,7 +338,7 @@ public class Task extends Model implements DbContract {
         List<String> hashtags = new ArrayList<String>();
         hashtags.addAll(getHashtagListFromString(taskDetails));
         hashtags.addAll(getHashtagListFromString(taskTitle));
-        if(hashtags.isEmpty())
+        if (hashtags.isEmpty())
             return;
         List<Hashtag> hashtagObjectList = new ArrayList<Hashtag>();
 
@@ -372,14 +369,16 @@ public class Task extends Model implements DbContract {
                 getIntFromBool(isComplete));
         taskValues
                 .put(TaskTable.COLUMN_NAME_ARCHIVED, getIntFromBool(archived));
-        int id = (int) db.insert(TaskTable.TABLE_NAME, null, taskValues);
+        long id = db.insert(TaskTable.TABLE_NAME, null, taskValues);
         setTaskId(id);
     }
 
     public void updateModel() {
         updateModelInDb();
         updateHashtagIfChanged();
-        getHashtagArrayFromDb();
+        if (!isArchived()) {
+            getHashtagArrayFromDb();
+        }
     }
 
     private void updateModelInDb() {
@@ -434,7 +433,17 @@ public class Task extends Model implements DbContract {
     }
 
     private void updateHashtagIfChanged() {
+
         Hashtag[] oldHashtagList = getHashtagArray();
+
+        if (isArchived()) {
+            if (oldHashtagList != null)
+                for (Hashtag hashtag : oldHashtagList)
+                    hashtag.archiveHashtag();
+            setHashtagArray(null);
+            return;
+        }
+
         List<String> newHashtagList = getHashtagsLabelsFromUpdatedFields();
         if (oldHashtagList != null) {
             for (Hashtag oldHashtag : oldHashtagList) {
@@ -455,7 +464,8 @@ public class Task extends Model implements DbContract {
                 }
             }
             setHashtagArray(hashtagObjectList.toArray(new Hashtag[newHashtagList.size()]));
-        }
+        } else
+            setHashtagArray(null);
     }
 
     public boolean doesValueExistInHashtagList(String value) {
@@ -470,11 +480,11 @@ public class Task extends Model implements DbContract {
         return false;
     }
 
-    public int getTaskId() {
+    public long getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(int taskId) {
+    public void setTaskId(long taskId) {
         this.taskId = taskId;
     }
 
@@ -502,14 +512,16 @@ public class Task extends Model implements DbContract {
         this.dateCreated = dateCreated;
     }
 
-    public Hashtag[] getHashtagArray() { return this.hashtagArray; }
+    public Hashtag[] getHashtagArray() {
+        return this.hashtagArray;
+    }
 
     public List<String> getHashtagLabelsList() {
         if (hashtagArray == null)
             return null;
         List<String> list = new ArrayList<String>();
         for (Hashtag h : hashtagArray)
-        list.add(h.getLabel());
+            list.add(h.getLabel());
         return list;
     }
 

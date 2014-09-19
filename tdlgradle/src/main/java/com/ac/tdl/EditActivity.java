@@ -22,9 +22,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.ac.tdl.SQL.DbHelper;
+import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
-import com.ac.tdl.model.TaskBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -80,9 +80,9 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_edit);
         Intent intent = getIntent();
         if (intent != null) {
-            int taskId = intent.getIntExtra("taskId", 0);
-            task = new TaskBuilder().withTaskId(taskId).build();
-            task.getModelFromDb();
+            long id = intent.getLongExtra("taskId", 0L);
+            task = TaskManager.getInstance().getTaskById(id);
+
         }
         setupViews();
     }

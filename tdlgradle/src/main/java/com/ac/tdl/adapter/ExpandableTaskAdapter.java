@@ -14,6 +14,7 @@ import com.ac.tdl.EditActivity;
 import com.ac.tdl.HomeFragment;
 import com.ac.tdl.MainActivity;
 import com.ac.tdl.R;
+import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.Task;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
@@ -31,6 +32,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     private HashMap<String, ContextualUndoAdapter> adapterByHeader;
     private HashMap<String, List<Task>> tasksByHeader;
     private List<String> headerList;
+    private TaskManager taskManager = TaskManager.getInstance();
 
     public ExpandableTaskAdapter(Activity activity, List<String> headerList, HashMap<String, List<Task>> tasksByHeader) {
 
@@ -112,7 +114,8 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         List<Task> associatedTasks = tasksByHeader.get(getItem(parentId));
         Task task = associatedTasks.get(position);
         associatedTasks.remove(position);
-        task.updateArchived(true);
+        task.setArchived(true);
+        taskManager.save(task);
 
         homeActivity.getHomeFragment().loadTasks();
     }

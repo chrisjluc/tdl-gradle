@@ -1,4 +1,4 @@
-package com.ac.tdl.test.models;
+package com.ac.tdl.tests.models;
 
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;

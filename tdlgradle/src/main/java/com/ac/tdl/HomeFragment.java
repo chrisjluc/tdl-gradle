@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ac.tdl.adapter.ExpandableTaskAdapter;
+import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 
@@ -32,9 +33,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private EditText etTaskTitle;
     private ImageButton bAdd;
     private ListView lvTasks;
+    private TaskManager taskManager = TaskManager.getInstance();
 
     HashMap<String, List<Task>> tasksByHeader;
-    List<String> orderedHeaderList;
 
     public HomeFragment() {
     }
@@ -70,31 +71,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadTasks() {
-        orderedHeaderList = new ArrayList<String>();
-        tasksByHeader = Task.getTasksByHeader(orderedHeaderList);
+        List<String> orderedHeaderList = new ArrayList<String>();
+        tasksByHeader = taskManager.getUnarchivedTasksByHeaderOrdered(orderedHeaderList);
         ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
                 tasksByHeader);
         setAdapter(lvTasks, adapter);
     }
 
     public void loadTasks(String hashtag) {
-        HashMap<String, List<Task>> filteredTasks = new HashMap<String, List<Task>>();
-        List<String> headerList = new ArrayList<String>();
-        for(String header : orderedHeaderList) {
-            List<Task> tasks = tasksByHeader.get(header);
-            for(Task task : tasks){
-                if(task.doesValueExistInHashtagList(hashtag)){
-                    if(!filteredTasks.containsKey(header))
-                        filteredTasks.put(header,new ArrayList<Task>());
-                    if(!headerList.contains(header))
-                        headerList.add(header);
-                    filteredTasks.get(header).add(task);
-                }
-            }
-        }
-
-        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), headerList,
-                filteredTasks);
+        List<String> orderedHeaderList = new ArrayList<String>();
+        tasksByHeader = taskManager.getUnArchivedTasksByHeaderAndHashtagOrdered(orderedHeaderList, hashtag);
+        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
+                tasksByHeader);
         setAdapter(lvTasks, adapter);
 
     }
@@ -130,7 +118,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         Task task = new TaskBuilder()
                 .withTaskTitle(taskTitle)
                 .build();
-        task.saveModel();
+        taskManager.save(task);
         etTaskTitle.setText("");
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);

@@ -1,7 +1,6 @@
 package com.ac.tdl;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,7 +8,6 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -122,8 +120,8 @@ public class MainActivity extends Activity {
     */
     public void updateHashtagList() {
         List<String> hashtagLabels = Hashtag.getHashtagLabelsInDb();
-        if(hashtagLabels != null)
-            for(String hashtag : hashtagLabels)
+        if (hashtagLabels != null)
+            for (String hashtag : hashtagLabels)
                 navDrawerItems.add(new NavDrawerItem(hashtag, navMenuIcons.getResourceId(1, -1)));
     }
 
@@ -134,7 +132,7 @@ public class MainActivity extends Activity {
         if (requestCode == 1)
             if (resultCode == this.RESULT_OK) {
                 boolean result = data.getBooleanExtra("isSaved", false);
-                int taskId = data.getIntExtra("taskId", -1);
+                long taskId = data.getLongExtra("taskId", -1L);
                 if (result) {
                     HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
                     fragment.loadTasks();
@@ -193,7 +191,7 @@ public class MainActivity extends Activity {
      */
     private void displayView(int position) {
         HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
-        if(position == 0)
+        if (position == 0)
             fragment.loadTasks();
         else
             fragment.loadTasks(navDrawerItems.get(position).getTitle());
@@ -216,18 +214,18 @@ public class MainActivity extends Activity {
     }
 
     public HomeFragment getHomeFragment() {
-        if(homeFragment == null)
+        if (homeFragment == null)
             homeFragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
         return homeFragment;
     }
 
     public CalendarFragment getCalendarFragment() {
-        if(calendarFragment == null)
+        if (calendarFragment == null)
             calendarFragment = (CalendarFragment) getFragmentManager().findFragmentById(R.id.frame_calendar);
         return calendarFragment;
     }
 
-        @Override
+    @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getActionBar().setTitle(mTitle);
