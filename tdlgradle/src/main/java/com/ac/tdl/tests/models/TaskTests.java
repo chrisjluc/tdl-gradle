@@ -33,6 +33,18 @@ public class TaskTests extends AndroidTestCase {
         taskManager = TaskManager.getInstance();
     }
 
+    public void testAddTwoTasks() throws Exception {
+        Task task = new TaskBuilder().withTaskTitle(TASK_TITLE).build();
+        taskManager.save(task);
+        assertEquals(TASK_TITLE, task.getTaskTitle());
+        assertEquals(1, task.getTaskId());
+
+        task = new TaskBuilder().withTaskTitle(TASK_TITLE).build();
+        taskManager.save(task);
+        assertEquals(TASK_TITLE, task.getTaskTitle());
+        assertEquals(2, task.getTaskId());
+    }
+
     public void testUpdateTaskTitle() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE).build();
         taskManager.save(task);
@@ -59,7 +71,7 @@ public class TaskTests extends AndroidTestCase {
 
     public void testUpdateTaskTitleDeletingOldHashtag() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_TWO_HASHTAGS).build();
-        task.saveModel();
+        taskManager.save(task);
         assertEquals(2,task.getHashtagArray().length);
         task.setTaskTitle(TASK_TITLE_WITH_FIRST_HASHTAG);
         taskManager.save(task);
@@ -82,7 +94,7 @@ public class TaskTests extends AndroidTestCase {
 
     public void testUpdateTaskArchived() throws Exception {
         Task task = new TaskBuilder().build();
-        task.saveModel();
+        taskManager.save(task);
         assertEquals(false,task.isArchived());
         task.setArchived(true);
         taskManager.save(task);
