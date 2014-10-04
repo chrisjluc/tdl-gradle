@@ -73,8 +73,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     public void loadTasks() {
         taskManager.setUnarchivedTasksByHeaderOrdered();
-        adapter = new ExpandableTaskAdapter(getActivity(), taskManager.getOrderedHeaderList());
-        setAdapter(lvTasks, adapter);
+        if(adapter == null) {
+            adapter = new ExpandableTaskAdapter(getActivity(), taskManager.getOrderedHeaderList());
+            setAdapter(lvTasks, adapter);
+        } else{
+            adapter.notifyDataSetChanged();
+        }
     }
 
     public void loadTasks(String hashtag) {
