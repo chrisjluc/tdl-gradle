@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.13.0'
     }
 }
 apply plugin: 'android-library'
@@ -33,6 +33,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.nineoldandroids:library:2.4.0'
 }
