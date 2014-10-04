@@ -33,7 +33,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/rlAddBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,9 +45,9 @@
             android:layout_marginTop="10dp"
             android:padding="5dp"
             android:id="@+id/etTaskTitle"
-            android:layout_width="530dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/bAdd"
+            android:layout_toLeftOf="@id/bAdd"
             android:singleLine="true"
             android:imeOptions="actionDone"
             android:textColor="@android:color/black"
@@ -67,6 +67,6 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/ic_add_archive"
             android:focusable="true" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
