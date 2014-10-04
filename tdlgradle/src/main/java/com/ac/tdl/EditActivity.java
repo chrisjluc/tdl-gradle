@@ -32,6 +32,8 @@ import java.util.Calendar;
 public class EditActivity extends FragmentActivity implements View.OnClickListener {
     public final static int TASK_TITLE_DIALOG = 0;
     public final static int TASK_DETAIL_DIALOG = 1;
+
+    private TaskManager taskManager = TaskManager.getInstance();
     private Task task;
     private SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
     private TextView tvTaskTitle;
@@ -172,7 +174,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 task.setPriority(cbPriority.isChecked());
                 if (calendar != null)
                     task.setDateReminder(calendar.getTimeInMillis());
-                task.updateModel();
+                taskManager.save(task);
                 Intent saveIntent = new Intent();
                 saveIntent.putExtra("isSaved", true);
                 saveIntent.putExtra("taskId", task.getTaskId());

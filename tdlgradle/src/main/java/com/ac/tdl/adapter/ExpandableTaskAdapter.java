@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.ac.tdl.model.Task;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,25 +32,49 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
 
     private MainActivity homeActivity;
     private HashMap<String, ContextualUndoAdapter> adapterByHeader;
-    private HashMap<String, List<Task>> tasksByHeader;
-    private List<String> headerList;
     private TaskManager taskManager = TaskManager.getInstance();
 
-    public ExpandableTaskAdapter(Activity activity, List<String> headerList, HashMap<String, List<Task>> tasksByHeader) {
-
+    public ExpandableTaskAdapter(Activity activity, List<String> headerList) {
         super(activity, R.layout.expandable_item, R.id.header_layout, R.id.content_layout, headerList);
-
         this.homeActivity = (MainActivity) activity;
-        this.tasksByHeader = tasksByHeader;
         this.adapterByHeader = new HashMap<String, ContextualUndoAdapter>();
-        this.headerList = headerList;
 
         for (String header : headerList) {
-            TaskAdapter taskAdapter = new TaskAdapter(activity, this.tasksByHeader.get(header));
-            ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
-                    R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
-            adapterByHeader.put(header, adapter);
+            createContextualUndoAdapter(header);
         }
+    }
+
+    private void createContextualUndoAdapter(String header) {
+        TaskAdapter taskAdapter = new TaskAdapter(homeActivity, taskManager.getTasksToDisplayByHeader().get(header));
+        ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
+                R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
+        adapterByHeader.put(header, adapter);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        List<String>  headersToRemove = new ArrayList<String>();
+        for (String header: adapterByHeader.keySet()){
+            if(!taskManager.getTasksToDisplayByHeader().containsKey(header)){
+                headersToRemove.add(header);
+                continue;
+            }
+            ContextualUndoAdapter adapter = adapterByHeader.get(header);
+            TaskAdapter taskAdapter = (TaskAdapter) adapter.getDecoratedBaseAdapter();
+            taskAdapter.clear();
+            taskAdapter.addAll(taskManager.getTasksToDisplayByHeader().get(header));
+        }
+
+        for(String header: headersToRemove)
+            adapterByHeader.remove(header);
+
+        for (String header: taskManager.getOrderedHeaderList()) {
+            if (!adapterByHeader.containsKey(header)) {
+                createContextualUndoAdapter(header);
+            }
+        }
+        expandAll();
     }
 
     @Override
@@ -71,10 +97,10 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
             LayoutInflater vi = LayoutInflater.from(homeActivity);
             view = vi.inflate(R.layout.content_item, null);
         }
-        ListView listview = (ListView) view.findViewById(R.id.lvNestedTasks);
+        LinearLayout ll = (LinearLayout) view;
+        ListView listview = (ListView) ll.getChildAt(0);
+
         ContextualUndoAdapter adapter = adapterByHeader.get(getItem(i));
-        if (adapter == null || listview == null)
-            return view;
         adapter.setAbsListView(listview);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(this);
@@ -85,14 +111,15 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
 
     private void setListViewHeightBasedOnChildren(ListView listView, ContextualUndoAdapter adapter) {
 
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+
         //All elements have same height
         View childView = adapter.getView(0, null, listView);
         childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         int height = childView.getMeasuredHeight() * adapter.getCount();
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = height
                 + (listView.getDividerHeight() * (adapter.getCount() - 1));
+
         listView.setLayoutParams(params);
         listView.requestLayout();
     }
@@ -100,7 +127,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         int parentId = parent.getId();
-        List<Task> associatedTasks = tasksByHeader.get(getItem(parentId));
+        List<Task> associatedTasks = taskManager.getTasksToDisplayByHeader().get(getItem(parentId));
         Task task = associatedTasks.get(position);
         Intent intent = new Intent(homeActivity, EditActivity.class);
         intent.putExtra("taskId", task.getTaskId());
@@ -111,17 +138,16 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     public void deleteItem(int position, View view) {
         View parent = (View) view.getParent();
         int parentId = parent.getId();
-        List<Task> associatedTasks = tasksByHeader.get(getItem(parentId));
+        List<Task> associatedTasks = taskManager.getTasksToDisplayByHeader().get(getItem(parentId));
         Task task = associatedTasks.get(position);
         associatedTasks.remove(position);
         task.setArchived(true);
         taskManager.save(task);
-
-        homeActivity.getHomeFragment().loadTasks();
+        this.notifyDataSetChanged();
     }
 
     public void expandAll() {
-        for (int i = 0; i < tasksByHeader.size(); i++)
+        for (int i = 0; i < taskManager.getTasksToDisplayByHeader().size(); i++)
             this.expand(i);
     }
 }

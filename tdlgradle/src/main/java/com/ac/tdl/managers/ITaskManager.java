@@ -11,8 +11,4 @@ import java.util.List;
 public interface ITaskManager {
 
     public Task getTaskById(long id);
-
-    public HashMap<String, List<Task>> getUnArchivedTasksByHeaderAndHashtagOrdered(List<String> orderedHeaderList, String hashtagLabel);
-
-    public HashMap<String, List<Task>> getUnarchivedTasksByHeaderOrdered(List<String> orderedHeaderList);
 }

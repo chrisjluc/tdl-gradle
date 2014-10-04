@@ -134,8 +134,8 @@ public class MainActivity extends Activity {
                 boolean result = data.getBooleanExtra("isSaved", false);
                 long taskId = data.getLongExtra("taskId", -1L);
                 if (result) {
-                    HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
-                    fragment.loadTasks();
+                    HomeFragment fragment = getHomeFragment();
+                    fragment.notifyDataSetChanged();
                     updateDrawerList();
                 }
             }
@@ -190,7 +190,7 @@ public class MainActivity extends Activity {
      * Diplaying fragment view for selected nav drawer list item
      */
     private void displayView(int position) {
-        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
+        HomeFragment fragment = getHomeFragment();
         if (position == 0)
             fragment.loadTasks();
         else

@@ -38,14 +38,28 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
 
     /**
      * For testing ONLY
+     *
      * @return
      */
     public static void nullifyInstance() {
         instance = null;
     }
 
+
+    /*
+    *
+    * Instance properties and methods
+    *
+    *
+    */
+
+    public HashMap<String, List<Task>> tasksToDisplayByHeader;
+    public List<String> orderedHeaderList;
+
     public TaskManager() {
         putAllTasksIntoCache();
+        tasksToDisplayByHeader = new HashMap<String, List<Task>>();
+        orderedHeaderList = new ArrayList<String>();
     }
 
     private void putAllTasksIntoCache() {
@@ -55,19 +69,28 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
             this.add(createTaskFromCursor(cursor));
     }
 
-    @Override
-    public HashMap<String, List<Task>> getUnarchivedTasksByHeaderOrdered(List<String> orderedHeaderList) {
-        return groupTasksByDate(orderedHeaderList, getUnarchivedTasksListOrderedByTime());
+    public HashMap<String, List<Task>> getTasksToDisplayByHeader() {
+        if (this.tasksToDisplayByHeader.isEmpty())
+            setUnarchivedTasksByHeaderOrdered();
+        return this.tasksToDisplayByHeader;
     }
 
-    @Override
-    public HashMap<String, List<Task>> getUnArchivedTasksByHeaderAndHashtagOrdered(List<String> orderedHeaderList, String hashtagLabel) {
-        return groupTasksByDate(orderedHeaderList, getUnarchivedTasksListByHashtagOrderedByTime(hashtagLabel));
+    private void setTasksToDisplayByHeader(HashMap<String, List<Task>> tasksToDisplayByHeader) {
+        this.tasksToDisplayByHeader = tasksToDisplayByHeader;
     }
 
-    private HashMap<String, List<Task>> groupTasksByDate(List<String> headers, List<Task> tasks) {
+    public void setUnarchivedTasksByHeaderOrdered() {
+        setTasksToDisplayByHeader(groupTasksByDate(getUnarchivedTasksListOrderedByTime()));
+    }
+
+    public void setUnArchivedTasksByHeaderAndHashtagOrdered(String hashtagLabel) {
+        setTasksToDisplayByHeader(groupTasksByDate(getUnarchivedTasksListByHashtagOrderedByTime(hashtagLabel)));
+    }
+
+    private HashMap<String, List<Task>> groupTasksByDate(List<Task> tasks) {
         HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
         long currentDate = getCurrentDate();
+        orderedHeaderList.clear();
 
         for (Task task : tasks) {
 
@@ -83,7 +106,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(INCOMPLETE, tasksList);
-                        headers.add(INCOMPLETE);
+                        orderedHeaderList.add(INCOMPLETE);
                     } else {
                         List<Task> tasksList = map.get(INCOMPLETE);
                         tasksList.add(task);
@@ -96,7 +119,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(TODAY, tasksList);
-                        headers.add(TODAY);
+                        orderedHeaderList.add(TODAY);
                     } else {
                         List<Task> tasksList = map.get(TODAY);
                         tasksList.add(task);
@@ -112,7 +135,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                         List<Task> tasksList = new ArrayList<Task>();
                         tasksList.add(task);
                         map.put(dateHeader, tasksList);
-                        headers.add(dateHeader);
+                        orderedHeaderList.add(dateHeader);
                     } else {
                         List<Task> tasksList = map.get(dateHeader);
                         tasksList.add(task);
@@ -125,7 +148,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                     List<Task> tasksList = new ArrayList<Task>();
                     tasksList.add(task);
                     map.put(TODAY, tasksList);
-                    headers.add(TODAY);
+                    orderedHeaderList.add(TODAY);
                 } else {
                     List<Task> tasksList = map.get(TODAY);
                     tasksList.add(task);
@@ -143,7 +166,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
      * @return tasksList
      */
     public List<Task> getUnarchivedTasksListByHashtagOrderedByTime(String hashtagLabel) {
-        long currentTime = getCurrentTime();
+        long currentTime = getCurrentDate();
         List<Task> unarchivedTasks = new TaskFilterByUnarchived().filter(this);
         if (hashtagLabel != null)
             unarchivedTasks = new TaskFilterByHashtag(hashtagLabel).filter(unarchivedTasks);
@@ -213,6 +236,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     private Task createTaskFromCursor(Cursor cursor) {
         Task t = new Task();
         try {
+            t.setTaskId(cursor.getLong(cursor
+                    .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_ID)));
             t.setTaskTitle(cursor.getString(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_TITLE)));
             t.setTaskDetails(cursor.getString(cursor
@@ -234,7 +259,6 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_IS_COMPLETE))));
             t.setArchived(getBoolFromInt(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_ARCHIVED))));
-            //getHashtagArrayFromDb();
         } catch (Exception e) {
             Log.d("Exception", e.toString());
         }
@@ -257,6 +281,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         } else {
             existingTask.updateModel();
         }
+        setUnarchivedTasksByHeaderOrdered();
     }
 
     protected static int getIntFromBool(boolean isTrue) {
@@ -290,5 +315,9 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     protected static long getCurrentDate() {
         Calendar c = new GregorianCalendar();
         return floorDateByDay(c);
+    }
+
+    public List<String> getOrderedHeaderList() {
+        return orderedHeaderList;
     }
 }

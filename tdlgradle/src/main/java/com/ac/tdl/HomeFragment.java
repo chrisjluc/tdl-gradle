@@ -35,6 +35,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ListView lvTasks;
     private TaskManager taskManager = TaskManager.getInstance();
 
+    ExpandableTaskAdapter adapter;
     HashMap<String, List<Task>> tasksByHeader;
 
     public HomeFragment() {
@@ -71,20 +72,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadTasks() {
-        List<String> orderedHeaderList = new ArrayList<String>();
-        tasksByHeader = taskManager.getUnarchivedTasksByHeaderOrdered(orderedHeaderList);
-        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
-                tasksByHeader);
+        taskManager.setUnarchivedTasksByHeaderOrdered();
+        adapter = new ExpandableTaskAdapter(getActivity(), taskManager.getOrderedHeaderList());
         setAdapter(lvTasks, adapter);
     }
 
     public void loadTasks(String hashtag) {
-        List<String> orderedHeaderList = new ArrayList<String>();
-        tasksByHeader = taskManager.getUnArchivedTasksByHeaderAndHashtagOrdered(orderedHeaderList, hashtag);
-        ExpandableTaskAdapter adapter = new ExpandableTaskAdapter(getActivity(), orderedHeaderList,
-                tasksByHeader);
-        setAdapter(lvTasks, adapter);
+        taskManager.setUnArchivedTasksByHeaderAndHashtagOrdered(hashtag);
+        adapter.notifyDataSetChanged();
+    }
 
+    public void notifyDataSetChanged(){
+        adapter.notifyDataSetChanged();
     }
 
     private void setAdapter(ListView listview, ExpandableTaskAdapter adapter) {
@@ -123,7 +122,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         etTaskTitle.setSelected(false);
         hideKeyboard(etTaskTitle);
 
-        loadTasks();
+        adapter.notifyDataSetChanged();
         ((MainActivity)getActivity()).updateDrawerList();
     }
 
