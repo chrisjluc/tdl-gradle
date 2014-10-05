@@ -23,10 +23,6 @@ import com.ac.tdl.managers.helpers.TaskListFilter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
     public static final int EDIT_ACTIVITY = 1;

@@ -256,6 +256,10 @@ public class Task extends Model implements DbContract, Cloneable {
 
     public List<Hashtag> getCopyOfHashtagList() {
         List<Hashtag> h = getHashtagList();
+
+        if (h == null)
+            return null;
+
         List<Hashtag> copy = new ArrayList<Hashtag>();
         try {
             for (Hashtag hashtag : h)

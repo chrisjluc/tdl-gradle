@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ac.tdl.adapter.DateArrayAdapter;
+import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.TdlDate;
 
 import java.text.DateFormat;
@@ -22,6 +23,8 @@ import antistatic.spinnerwheel.OnWheelChangedListener;
 import antistatic.spinnerwheel.OnWheelClickedListener;
 import antistatic.spinnerwheel.adapters.ArrayWheelAdapter;
 
+import static com.ac.tdl.GenericHelper.floorDateByDay;
+
 /**
  * Created by aaronte on 2014-06-15.
  */
@@ -32,22 +35,36 @@ public class CalendarFragment extends Fragment implements OnWheelClickedListener
     private static final int DAY_COUNT = 364;
     private static final int YEAR_COUNT = 4;
     private AbstractWheel dateWheel, monthWheel, yearWheel;
+    private DateArrayAdapter dateAdapter;
     private List<TdlDate> dates;
     private List<String> years;
+    private TaskManager taskManager = TaskManager.getInstance();
 
+    private DistinctDaysToHighlightChangeListener listener = new DistinctDaysToHighlightChangeListener() {
+        @Override
+        public void notifyChange(List<Long> timestamps) {
+            setDatestoHighlight(timestamps);
+        }
+    };
+
+    public interface DistinctDaysToHighlightChangeListener{
+        public void notifyChange(List<Long> timestamps);
+    }
     public CalendarFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        taskManager.setDistinctDaysToHighlightChangeListener(listener);
         setDates();
+        setDatestoHighlight(taskManager.getDistinctTimestampsToHighlight());
 
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         // Set Up Spinners
         dateWheel = (AbstractWheel) rootView.findViewById(R.id.whvCalendar);
-        DateArrayAdapter dateAdapter = new DateArrayAdapter(getActivity().getApplicationContext(), dates);
+        dateAdapter = new DateArrayAdapter(getActivity().getApplicationContext(), dates);
         dateWheel.setViewAdapter(dateAdapter);
         //Set to current date
         dateWheel.setCurrentItem(DAY_COUNT / 2);
@@ -82,6 +99,16 @@ public class CalendarFragment extends Fragment implements OnWheelClickedListener
         return rootView;
     }
 
+    private void setDatestoHighlight(List<Long> timestamps) {
+        for(TdlDate date: dates){
+            if(timestamps.contains(date.getCurrentDayTimestamp()))
+                date.setHighlighted(true);
+            else
+                date.setHighlighted(false);
+        }
+        if(dateAdapter != null)
+            dateAdapter.notifyDataChanged();
+    }
 
 
     private void setDates() {
@@ -96,6 +123,7 @@ public class CalendarFragment extends Fragment implements OnWheelClickedListener
             date.setDayNumber(format.format(calendar.getTime()));
             date.setMonth(calendar.get(Calendar.MONTH));
             date.setYear(calendar.get(Calendar.YEAR));
+            date.setCurrentDate(floorDateByDay(calendar));
             dates.add(date);
             calendar.add(Calendar.DATE, 1);
         }

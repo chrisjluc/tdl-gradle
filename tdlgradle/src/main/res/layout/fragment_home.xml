@@ -47,7 +47,7 @@
             android:id="@+id/etTaskTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/bAdd"
+            android:layout_toLeftOf="@+id/bAdd"
             android:singleLine="true"
             android:imeOptions="actionDone"
             android:textColor="@android:color/black"

@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.ac.tdl.CalendarFragment;
+import com.ac.tdl.GenericHelper;
 import com.ac.tdl.SQL.DbContract;
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.managers.helpers.TaskComparatorByDateReminder;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +32,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     private static final String INCOMPLETE = "Incomplete";
     private static final String TODAY = "Today";
     private TaskListFilter taskListFilter;
-    private HashtagManager hashtagManager = HashtagManager.getInstance();
+
+    private CalendarFragment.DistinctDaysToHighlightChangeListener daysToHighlightListener;
 
     public static TaskManager getInstance() {
         if (instance == null)
@@ -83,15 +85,17 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
 
     public void refreshTasksToDisplayByHeader() {
         groupTasksToDisplayByDate(getUnarchivedTasksListOrderedByTime());
+        if(daysToHighlightListener != null)
+            daysToHighlightListener.notifyChange(getDistinctTimestampsToHighlight());
     }
 
     private String getHeaderByTask(Task task){
-        long currentDate = getCurrentDate();
+        long currentDate = GenericHelper.getFlooredCurrentDate();
 
         if (task.getDateReminder() > 0) {
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(task.getDateReminder());
-            long taskReminderDate = floorDateByDay(c);
+            long taskReminderDate = GenericHelper.floorDateByDay(c);
 
             if (taskReminderDate < currentDate)
                 return INCOMPLETE;
@@ -125,15 +129,35 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         }
     }
 
+    public void setDistinctDaysToHighlightChangeListener(CalendarFragment.DistinctDaysToHighlightChangeListener listener) {
+        this.daysToHighlightListener = listener;
+    }
+
+    public List<Long> getDistinctTimestampsToHighlight() {
+        List<Long> timestamps = new ArrayList<Long>();
+        List<Task> tasks = getUnarchivedTasksListOrderedByTime();
+        for (Task task: tasks){
+            long timestamp = GenericHelper.getFlooredCurrentDate();
+            if (task.getDateReminder() > 0) {
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(task.getDateReminder());
+                timestamp = GenericHelper.floorDateByDay(c);
+            }
+            if(!timestamps.contains(timestamp))
+                timestamps.add(timestamp);
+        }
+        return timestamps;
+    }
+
     /**
      * From Earliest task to latest task
      *
      * @return tasksList
      */
     public List<Task> getUnarchivedTasksListOrderedByTime() {
-        long currentTime = getCurrentDate();
+        long currentTime = GenericHelper.getFlooredCurrentDate();
         List<Task> unarchivedTasks = new TaskFilterByUnarchived().filter(this);
-        if (taskListFilter.getHashtagFilter() != null)
+        if (taskListFilter != null && taskListFilter.getHashtagFilter() != null)
             unarchivedTasks = new TaskFilterByHashtag(taskListFilter.getHashtagFilter()).filter(unarchivedTasks);
 
         for (Task task : unarchivedTasks)
@@ -159,7 +183,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_TITLE)));
             t.setTaskDetails(cursor.getString(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_DETAILS)));
-            t.setPriority(getBoolFromInt(cursor.getInt(cursor
+            t.setPriority(GenericHelper.getBoolFromInt(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_PRIORITY))));
             t.setDateCreated(cursor.getLong(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_DATE_CREATED)));
@@ -172,9 +196,9 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
             t.setNotifyBeforeReminderInMS(cursor
                     .getLong(cursor
                             .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_NOTIFY_BEFORE_REMINDER_MS)));
-            t.setComplete(getBoolFromInt(cursor.getInt(cursor
+            t.setComplete(GenericHelper.getBoolFromInt(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_IS_COMPLETE))));
-            t.setArchived(getBoolFromInt(cursor.getInt(cursor
+            t.setArchived(GenericHelper.getBoolFromInt(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_ARCHIVED))));
         } catch (Exception e) {
             Log.d("Exception", e.toString());
@@ -211,7 +235,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         if(!this.contains(task))
             this.add(task);
 
-        if(taskListFilter.anyFiltersApplied()){
+        if(taskListFilter != null && taskListFilter.getHashtagFilter() != null){
             if(!task.doesValueExistInHashtagList(taskListFilter.getHashtagFilter()))
                 return;
         }
@@ -223,8 +247,11 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
             return;
         }
 
-        if(!tasksToDisplayByHeader.get(header).contains(task))
+        if(!tasksToDisplayByHeader.get(header).contains(task)){
             tasksToDisplayByHeader.get(header).add(task);
+            if (daysToHighlightListener != null)
+                daysToHighlightListener.notifyChange(getDistinctTimestampsToHighlight());
+        }
     }
 
     private void removeTaskFromCache(Task task){
@@ -233,44 +260,13 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                 && tasksToDisplayByHeader.get(header).contains(task)) {
             List<Task> list = tasksToDisplayByHeader.get(header);
             list.remove(task);
+            if (daysToHighlightListener != null)
+                daysToHighlightListener.notifyChange(getDistinctTimestampsToHighlight());
             if(list.size() == 0) {
                 tasksToDisplayByHeader.remove(header);
                 orderedHeaderList.remove(header);
             }
         }
-    }
-
-    protected static int getIntFromBool(boolean isTrue) {
-        if (isTrue) {
-            return 1;
-        }
-        return 0;
-    }
-
-    protected boolean getBoolFromInt(int isTrue) throws Exception {
-        if (isTrue == 1) {
-            return true;
-        } else if (isTrue == 0) {
-            return false;
-        }
-        throw new Exception();
-    }
-
-    protected static long getCurrentTime() {
-        return Calendar.getInstance().getTimeInMillis();
-    }
-
-    protected static long floorDateByDay(Calendar c) {
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime().getTime();
-    }
-
-    protected static long getCurrentDate() {
-        Calendar c = new GregorianCalendar();
-        return floorDateByDay(c);
     }
 
     public List<String> getOrderedHeaderList() {

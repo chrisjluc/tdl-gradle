@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.ac.tdl.GenericHelper;
 import com.ac.tdl.MainActivity;
 import com.ac.tdl.SQL.DbContract;
 import com.ac.tdl.SQL.DbHelper;
@@ -119,7 +120,7 @@ public class HashtagManager implements IHashtagManager{
                             .getColumnIndexOrThrow(DbContract.HashtagTable.COLUMN_NAME_DATE_CREATED)));
             h.setTaskId(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.HashtagTable.COLUMN_NAME_TASK_ID)));
-            h.setArchived(getBoolFromInt(cursor.getInt(cursor
+            h.setArchived(GenericHelper.getBoolFromInt(cursor.getInt(cursor
                     .getColumnIndexOrThrow(DbContract.HashtagTable.COLUMN_NAME_ARCHIVED))));
         } catch (Exception e) {
             Log.d("Exception", e.toString());
@@ -171,7 +172,7 @@ public class HashtagManager implements IHashtagManager{
         while (matcher.find()) {
             String match = matcher.group(1);
             //Don't want numbers to be valid hashtags
-            if (!isNumber(match))
+            if (!GenericHelper.isNumber(match))
                 hashtagList.add(match);
         }
         return hashtagList;
@@ -188,23 +189,5 @@ public class HashtagManager implements IHashtagManager{
             hashtagBuilder.append(" #" + s);
         }
         return hashtagBuilder.toString();
-    }
-
-    public static boolean isNumber(String str) {
-        try {
-            double d = Double.parseDouble(str);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
-
-    protected boolean getBoolFromInt(int isTrue) throws Exception {
-        if (isTrue == 1) {
-            return true;
-        } else if (isTrue == 0) {
-            return false;
-        }
-        throw new Exception();
     }
 }

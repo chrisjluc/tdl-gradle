@@ -8,12 +8,15 @@ public class TdlDate {
     private String dayNumber;
     private int month;
     private int year;
+    private long currentDate;
+    private boolean ishighlighted = false;
 
-    public TdlDate(String dayName, String dayNumber, int month, int year) {
+    public TdlDate(String dayName, String dayNumber, int month, int year, long currentDate) {
         this.dayName = dayName;
         this.dayNumber = dayNumber;
         this.month = month;
         this.year = year;
+        this.currentDate = currentDate;
     }
 
     public TdlDate() {
@@ -49,5 +52,21 @@ public class TdlDate {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public long getCurrentDayTimestamp() {
+        return currentDate;
+    }
+
+    public void setCurrentDate(long currentDate) {
+        this.currentDate = currentDate;
+    }
+
+    public boolean isHighlighted() {
+        return ishighlighted;
+    }
+
+    public void setHighlighted(boolean ishighlighted) {
+        this.ishighlighted = ishighlighted;
     }
 }
