@@ -5,7 +5,7 @@ public class HashtagBuilder {
 	private String label;
 	private long dateCreated;
 	private long taskId = -1;
-	private boolean archived;
+	private boolean archived = false;
 
 	public HashtagBuilder withHashtagId(long hashtagId) {
 		this.hashtagId = hashtagId;

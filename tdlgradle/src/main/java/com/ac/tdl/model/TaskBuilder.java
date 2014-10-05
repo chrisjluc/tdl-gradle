@@ -1,5 +1,7 @@
 package com.ac.tdl.model;
 
+import java.util.List;
+
 public class TaskBuilder {
 	private long taskId = -1;
 	private String taskTitle;
@@ -13,7 +15,7 @@ public class TaskBuilder {
 	private boolean archived;
 
 	// Additional attributes
-	private Hashtag[] hashtagArray;
+	private List<Hashtag> hashtagList;
 
 	public TaskBuilder withTaskId(long taskId) {
 		this.taskId = taskId;
@@ -66,14 +68,14 @@ public class TaskBuilder {
 		return this;
 	}
 
-	public TaskBuilder withHashtagArray(Hashtag[] hashtagArray) {
-		this.hashtagArray = hashtagArray;
+	public TaskBuilder withHashtagArray(List<Hashtag> hashtagList) {
+		this.hashtagList = hashtagList;
 		return this;
 	}
 
 	public Task build() {
 		return new Task(taskId, taskTitle, taskDetails, priority, dateCreated,
 				dateReminder, repetitionInMS, notifyBeforeReminderInMS,
-				isComplete, archived, hashtagArray);
+				isComplete, archived, hashtagList);
 	}
 }

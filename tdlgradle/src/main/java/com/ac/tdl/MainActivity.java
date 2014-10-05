@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.adapter.NavDrawerListAdapter;
+import com.ac.tdl.managers.HashtagManager;
 import com.ac.tdl.model.Hashtag;
 
 import java.util.ArrayList;
@@ -25,9 +26,6 @@ public class MainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-
-    // nav drawer title
-    private CharSequence mDrawerTitle;
 
     // used to store app title
     private CharSequence mTitle;
@@ -43,12 +41,35 @@ public class MainActivity extends Activity {
     private HomeFragment homeFragment;
     private CalendarFragment calendarFragment;
 
+    // Listeners
+    public interface HashtagManagerListener{
+        public void notifyOnDistinctHashtagChanged();
+    }
+
+    private HashtagManagerListener hashtagManagerListener = new HashtagManagerListener() {
+        @Override
+        public void notifyOnDistinctHashtagChanged() {
+            updateDrawerList();
+        }
+    };
+
+    //Managers
+    private HashtagManager hashtagManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         DbHelper.getInstance(this);
+
+        hashtagManager = HashtagManager.getInstance();
+        hashtagManager.setHashtagManagerListener(hashtagManagerListener);
+
+        // enabling action bar app icon and behaving it as toggle button
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
         updateDrawerList();
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
@@ -81,7 +102,7 @@ public class MainActivity extends Activity {
      *  Load drawer list
      */
     public void updateDrawerList() {
-        mTitle = mDrawerTitle = getTitle();
+        mTitle = getTitle();
 
         // load slide menu items
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
@@ -90,15 +111,22 @@ public class MainActivity extends Activity {
         navMenuIcons = getResources()
                 .obtainTypedArray(R.array.nav_drawer_icons);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.layout_drawer);
-        mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+        if(mDrawerLayout == null)
+            mDrawerLayout = (DrawerLayout) findViewById(R.id.layout_drawer);
 
-        navDrawerItems = new ArrayList<NavDrawerItem>();
+        if(mDrawerList == null)
+            mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+
+        if (navDrawerItems == null)
+            navDrawerItems = new ArrayList<NavDrawerItem>();
+        else
+            navDrawerItems.clear();
 
         // adding nav drawer items to array
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
 
-        updateHashtagList();
+        for (String hashtag : hashtagManager.getDistinctHashtags())
+            navDrawerItems.add(new NavDrawerItem(hashtag, navMenuIcons.getResourceId(1, -1)));
 
         // Recycle the typed array
         navMenuIcons.recycle();
@@ -106,23 +134,12 @@ public class MainActivity extends Activity {
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
 
         // setting the nav drawer list adapter
-        adapter = new NavDrawerListAdapter(getApplicationContext(),
-                navDrawerItems);
-        mDrawerList.setAdapter(adapter);
-
-        // enabling action bar app icon and behaving it as toggle button
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-    }
-
-    /*
-    *   Load hashtag list
-    */
-    public void updateHashtagList() {
-        List<String> hashtagLabels = Hashtag.getHashtagLabelsInDb();
-        if (hashtagLabels != null)
-            for (String hashtag : hashtagLabels)
-                navDrawerItems.add(new NavDrawerItem(hashtag, navMenuIcons.getResourceId(1, -1)));
+        if(adapter == null) {
+            adapter = new NavDrawerListAdapter(getApplicationContext(),
+                    navDrawerItems);
+            mDrawerList.setAdapter(adapter);
+        }
+        adapter.notifyDataSetChanged();
     }
 
     /*
@@ -132,11 +149,9 @@ public class MainActivity extends Activity {
         if (requestCode == 1)
             if (resultCode == this.RESULT_OK) {
                 boolean result = data.getBooleanExtra("isSaved", false);
-                long taskId = data.getLongExtra("taskId", -1L);
                 if (result) {
                     HomeFragment fragment = getHomeFragment();
                     fragment.notifyDataSetChanged();
-                    updateDrawerList();
                 }
             }
     }

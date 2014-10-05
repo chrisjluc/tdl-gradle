@@ -1,17 +1,16 @@
 package com.ac.tdl.model;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.ac.tdl.MainActivity;
 import com.ac.tdl.SQL.DbContract;
 import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.managers.HashtagManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Task extends Model implements DbContract {
 
@@ -28,11 +27,12 @@ public class Task extends Model implements DbContract {
     private boolean archived;
 
     // Additional attributes
-    private Hashtag[] hashtagArray;
+    private List<Hashtag> hashtagList;
 
     private static final String INCOMPLETE = "Incomplete";
     private static final String TODAY = "Today";
     private static SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
+    private HashtagManager hashtagManager = HashtagManager.getInstance();
 
     /**
      * Important: need DB is you want SQL cmds
@@ -47,12 +47,12 @@ public class Task extends Model implements DbContract {
      * @param notifyBeforeReminderInMS
      * @param isComplete
      * @param archived
-     * @param hashtagArray
+     * @param hashtagList
      */
-    public Task(long taskId, String taskTitle, String taskDetails,
+    protected Task(long taskId, String taskTitle, String taskDetails,
                 boolean priority, long dateCreated, long dateReminder,
                 long repetitionInMS, long notifyBeforeReminderInMS,
-                boolean isComplete, boolean archived, Hashtag[] hashtagArray) {
+                boolean isComplete, boolean archived, List<Hashtag> hashtagList) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
         if (taskDetails == null || taskDetails.isEmpty())
@@ -66,11 +66,10 @@ public class Task extends Model implements DbContract {
         this.notifyBeforeReminderInMS = notifyBeforeReminderInMS;
         this.isComplete = isComplete;
         this.archived = archived;
-        this.hashtagArray = hashtagArray;
+        this.hashtagList = hashtagList;
     }
 
     public Task() {
-
     }
     /**
      * SHOULD ONLY BE CALLED BY TASK MANAGER
@@ -89,14 +88,12 @@ public class Task extends Model implements DbContract {
         hashtags.addAll(HashtagManager.getHashtagListFromString(taskTitle));
         if (hashtags.isEmpty())
             return;
-        List<Hashtag> hashtagObjectList = new ArrayList<Hashtag>();
 
         for (String hashtag : hashtags) {
             Hashtag hashtagObject = new HashtagBuilder().withLabel(hashtag).withTaskId(taskId).build();
-            hashtagObject.setModelInDb();
-            hashtagObjectList.add(hashtagObject);
+            hashtagManager.save(hashtagObject);
         }
-        setHashtagArray(hashtagObjectList.toArray(new Hashtag[hashtags.size()]));
+        setHashtagList(hashtagManager.getHashtagsByTaskId(taskId));
     }
 
     /**
@@ -107,8 +104,6 @@ public class Task extends Model implements DbContract {
     public List<String> getHashtagsLabelsFromUpdatedFields() {
         List<String> hashtags = HashtagManager.getHashtagListFromString(taskDetails);
         hashtags.addAll(HashtagManager.getHashtagListFromString(taskTitle));
-        if (hashtags.isEmpty())
-            return null;
         return hashtags;
     }
 
@@ -138,9 +133,7 @@ public class Task extends Model implements DbContract {
     public void updateModel() {
         updateModelInDb();
         updateHashtagIfChanged();
-//        if (!isArchived()) {
-//            hashtagManager.getHashtagById();
-//        }
+        hashtagManager.notifyDistinctHashtagChanged();
     }
 
     private void updateModelInDb() {
@@ -168,13 +161,15 @@ public class Task extends Model implements DbContract {
 
     private void updateHashtagIfChanged() {
 
-        Hashtag[] oldHashtagList = getHashtagArray();
+        List<Hashtag> oldHashtagList = getCopyOfHashtagList();
 
         if (isArchived()) {
             if (oldHashtagList != null)
-                for (Hashtag hashtag : oldHashtagList)
-                    hashtag.archiveHashtag();
-            setHashtagArray(null);
+                for (Hashtag hashtag : oldHashtagList) {
+                    hashtag.setArchived(true);
+                    hashtagManager.save(hashtag);
+                }
+            setHashtagList(null);
             return;
         }
 
@@ -183,27 +178,28 @@ public class Task extends Model implements DbContract {
             for (Hashtag oldHashtag : oldHashtagList) {
                 // if oldhashtags don't exist anymore, set them as archived
                 if (!newHashtagList.contains(oldHashtag.getLabel())) {
-                    oldHashtag.archiveHashtag();
+                    oldHashtag.setArchived(true);
+                    hashtagManager.save(oldHashtag);
+
                 }
             }
         }
         if (newHashtagList != null) {
-            List<Hashtag> hashtagObjectList = new ArrayList<Hashtag>();
             for (String newHashtag : newHashtagList) {
                 // if newhashtags don't exist, create them
                 if (!doesValueExistInHashtagList(newHashtag)) {
                     Hashtag hashtag = new HashtagBuilder().withLabel(newHashtag).withTaskId(taskId).build();
-                    hashtag.setModelInDb();
-                    hashtagObjectList.add(hashtag);
+                    hashtagManager.save(hashtag);
                 }
             }
-            setHashtagArray(hashtagObjectList.toArray(new Hashtag[newHashtagList.size()]));
+            setHashtagList(hashtagManager.getHashtagsByTaskId(this.getTaskId()));
         } else
-            setHashtagArray(null);
+            setHashtagList(null);
+
     }
 
     public boolean doesValueExistInHashtagList(String value) {
-        Hashtag[] array = getHashtagArray();
+        List<Hashtag> array = getHashtagList();
         if (array == null)
             return false;
         for (Hashtag oldHashtag : array) {
@@ -246,21 +242,35 @@ public class Task extends Model implements DbContract {
         this.dateCreated = dateCreated;
     }
 
-    public Hashtag[] getHashtagArray() {
-        return this.hashtagArray;
+    public List<Hashtag> getHashtagList() {
+        if (this.hashtagList == null)
+            this.hashtagList = hashtagManager.getHashtagsByTaskId(taskId);
+        return this.hashtagList;
+    }
+
+    public List<Hashtag> getCopyOfHashtagList() {
+        List<Hashtag> h = getHashtagList();
+        List<Hashtag> copy = new ArrayList<Hashtag>();
+        try {
+            for (Hashtag hashtag : h)
+                copy.add(hashtag.clone());
+        }catch(Exception e){
+            Log.d("Task", e.toString());
+        }
+        return copy;
     }
 
     public List<String> getHashtagLabelsList() {
-        if (getHashtagArray() == null)
+        if (getHashtagList() == null)
             return null;
         List<String> list = new ArrayList<String>();
-        for (Hashtag h : getHashtagArray())
+        for (Hashtag h : getHashtagList())
             list.add(h.getLabel());
         return list;
     }
 
-    public void setHashtagArray(Hashtag[] hashtagArray) {
-        this.hashtagArray = hashtagArray;
+    public void setHashtagList(List<Hashtag> hashtagList) {
+        this.hashtagList = hashtagList;
     }
 
     public boolean isPriority() {

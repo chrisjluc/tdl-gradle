@@ -1,17 +1,12 @@
 package com.ac.tdl.model;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ac.tdl.SQL.DbContract;
 import com.ac.tdl.SQL.DbHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Hashtag extends Model implements DbContract {
+public class Hashtag extends Model implements DbContract , Cloneable{
 
     private long hashtagId;
     private String label;
@@ -29,7 +24,7 @@ public class Hashtag extends Model implements DbContract {
      * @param taskId
      * @param archived
      */
-    public Hashtag(long hashtagId, String label, long dateCreated, long taskId,
+    protected Hashtag(long hashtagId, String label, long dateCreated, long taskId,
                    boolean archived) {
         this.hashtagId = hashtagId;
         this.label = label;
@@ -39,60 +34,6 @@ public class Hashtag extends Model implements DbContract {
     }
 
     public Hashtag() {
-    }
-
-    public static List<String> getHashtagLabelsInDb() {
-        String[] projection = {DbContract.HashtagTable.COLUMN_NAME_HASHTAG_LABEL};
-        String selection = HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
-        String[] selectionArgs = new String[]{"0"};
-        Cursor cursor = db.query(true, DbContract.HashtagTable.TABLE_NAME, projection,
-                selection, selectionArgs, null, null, null, null);
-        List<String> hashtagList = new ArrayList<String>();
-        while (cursor.moveToNext()) {
-            hashtagList.add(cursor.getString(0));
-        }
-        return hashtagList;
-    }
-
-    public void getModelFromDb() {
-        String[] projection = {HashtagTable.COLUMN_NAME_HASHTAG_LABEL,
-                HashtagTable.COLUMN_NAME_DATE_CREATED,
-                HashtagTable.COLUMN_NAME_TASK_ID,
-                HashtagTable.COLUMN_NAME_ARCHIVED
-        };
-        String selection = HashtagTable.COLUMN_NAME_ID + "=? AND "
-                + HashtagTable.COLUMN_NAME_ARCHIVED + "=?";
-        try {
-            String[] selectionArgs = new String[]{String.valueOf(hashtagId), "0"};
-            Cursor cursor = db.query(HashtagTable.TABLE_NAME, projection, selection,
-                    selectionArgs, null, null, null);
-            cursor.moveToFirst();
-            setLabel(cursor
-                    .getString(cursor
-                            .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_HASHTAG_LABEL)));
-            setDateCreated(cursor
-                    .getLong(cursor
-                            .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_DATE_CREATED)));
-            setTaskId(cursor.getInt(cursor
-                    .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_TASK_ID)));
-            setArchived(getBoolFromInt(cursor.getInt(cursor
-                    .getColumnIndexOrThrow(HashtagTable.COLUMN_NAME_ARCHIVED))));
-        } catch (Exception e) {
-            Log.d("Exception", e.toString());
-        }
-    }
-
-    public static String createHashtagString(List<String> array) {
-        StringBuilder hashtagBuilder = new StringBuilder();
-
-        if (array == null) {
-            return "";
-        }
-
-        for (String s : array) {
-            hashtagBuilder.append(" #" + s);
-        }
-        return hashtagBuilder.toString();
     }
 
     @Override
@@ -115,6 +56,21 @@ public class Hashtag extends Model implements DbContract {
         String selection = HashtagTable.COLUMN_NAME_ID + "=? ";
         String[] selectionArgs = {String.valueOf(hashtagId)};
         db.update(HashtagTable.TABLE_NAME, values, selection, selectionArgs);
+    }
+
+    public Hashtag clone() throws CloneNotSupportedException {
+        Hashtag clone=(Hashtag)super.clone();
+        return clone;
+    }
+
+    public boolean equals(Object o){
+        if (!(o instanceof Hashtag))
+            return false;
+        Hashtag obj = (Hashtag) o;
+        if(hashtagId == obj.getHashtagId())
+            return true;
+
+        return false;
     }
 
     public long getHashtagId() {
@@ -149,7 +105,7 @@ public class Hashtag extends Model implements DbContract {
         this.taskId = taskId;
     }
 
-    public boolean getArchived() {
+    public boolean isArchived() {
         return archived;
     }
 

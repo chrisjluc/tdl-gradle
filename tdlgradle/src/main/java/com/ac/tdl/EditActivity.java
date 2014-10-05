@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.ac.tdl.SQL.DbHelper;
+import com.ac.tdl.managers.HashtagManager;
 import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.Hashtag;
 import com.ac.tdl.model.Task;
@@ -99,7 +100,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         tvTaskDetail.setText(task.getTaskDetails());
 
         tvHashtags = (TextView) findViewById(R.id.tvEditHashtags);
-        String hashtagString = Hashtag.createHashtagString(task.getHashtagLabelsList());
+        String hashtagString = HashtagManager.createHashtagString(task.getHashtagLabelsList());
         tvHashtags.setText(hashtagString);
 
         cbPriority = (CheckBox) findViewById(R.id.cbEditPriority);
@@ -278,7 +279,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                             String input = etInput.getText().toString();
                             task.setTaskTitle(input);
                             tvTaskTitle.setText(input);
-                            String hashtags = Hashtag.createHashtagString(task.getHashtagsLabelsFromUpdatedFields());
+                            String hashtags = HashtagManager.createHashtagString(task.getHashtagsLabelsFromUpdatedFields());
                             tvHashtags.setText(hashtags);
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -296,7 +297,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                             String input = etInput.getText().toString();
                             task.setTaskDetails(input);
                             tvTaskDetail.setText(input);
-                            tvHashtags.setText(Hashtag.createHashtagString(task.getHashtagsLabelsFromUpdatedFields()));
+                            tvHashtags.setText(HashtagManager.createHashtagString(task.getHashtagsLabelsFromUpdatedFields()));
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
