@@ -9,6 +9,7 @@ import com.ac.tdl.SQL.DbHelper;
 import com.ac.tdl.managers.helpers.TaskComparatorByDateReminder;
 import com.ac.tdl.managers.helpers.TaskFilterByHashtag;
 import com.ac.tdl.managers.helpers.TaskFilterByUnarchived;
+import com.ac.tdl.managers.helpers.TaskListFilter;
 import com.ac.tdl.model.Task;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +30,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     private static SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
     private static final String INCOMPLETE = "Incomplete";
     private static final String TODAY = "Today";
-
+    private TaskListFilter taskListFilter;
     private HashtagManager hashtagManager = HashtagManager.getInstance();
 
     public static TaskManager getInstance() {
@@ -64,8 +65,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     }
 
     public HashMap<String, List<Task>> getTasksToDisplayByHeader() {
-        if (this.tasksToDisplayByHeader.isEmpty())
-            setUnarchivedTasksByHeaderOrdered();
+        if (this.tasksToDisplayByHeader == null)
+            refreshTasksToDisplayByHeader();
         return this.tasksToDisplayByHeader;
     }
 
@@ -73,12 +74,15 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         this.tasksToDisplayByHeader = tasksToDisplayByHeader;
     }
 
-    public void setUnarchivedTasksByHeaderOrdered() {
-        setTasksToDisplayByHeader(groupTasksByDate(getUnarchivedTasksListOrderedByTime()));
+    public void setFilter(TaskListFilter taskListFilter) {
+        this.taskListFilter = taskListFilter;
+        refreshTasksToDisplayByHeader();
     }
 
-    public void setUnArchivedTasksByHeaderAndHashtagOrdered(String hashtagLabel) {
-        setTasksToDisplayByHeader(groupTasksByDate(getUnarchivedTasksListByHashtagOrderedByTime(hashtagLabel)));
+
+
+    public void refreshTasksToDisplayByHeader() {
+        groupTasksToDisplayByDate(getUnarchivedTasksListOrderedByTime());
     }
 
     private String getHeaderByTask(Task task){
@@ -101,36 +105,36 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         return TODAY;
     }
 
-    private HashMap<String, List<Task>> groupTasksByDate(List<Task> tasks) {
-        HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
+    private void groupTasksToDisplayByDate(List<Task> tasks) {
+        if(tasksToDisplayByHeader == null)
+            tasksToDisplayByHeader = new HashMap<String, List<Task>>();
+        else
+            tasksToDisplayByHeader.clear();
+
         orderedHeaderList.clear();
 
         for (Task task : tasks) {
 
             String header = getHeaderByTask(task);
 
-            if (!map.containsKey(header)) {
-                map.put(header, new ArrayList<Task>());
+            if (!tasksToDisplayByHeader.containsKey(header)) {
+                tasksToDisplayByHeader.put(header, new ArrayList<Task>());
                 orderedHeaderList.add(header);
             }
-
-            List<Task> tasksList = map.get(header);
-            tasksList.add(task);
+            tasksToDisplayByHeader.get(header).add(task);
         }
-        return map;
     }
 
     /**
      * From Earliest task to latest task
-     * tasks with no reminder date will always be the first under 'today' section
      *
      * @return tasksList
      */
-    public List<Task> getUnarchivedTasksListByHashtagOrderedByTime(String hashtagLabel) {
+    public List<Task> getUnarchivedTasksListOrderedByTime() {
         long currentTime = getCurrentDate();
         List<Task> unarchivedTasks = new TaskFilterByUnarchived().filter(this);
-        if (hashtagLabel != null)
-            unarchivedTasks = new TaskFilterByHashtag(hashtagLabel).filter(unarchivedTasks);
+        if (taskListFilter.getHashtagFilter() != null)
+            unarchivedTasks = new TaskFilterByHashtag(taskListFilter.getHashtagFilter()).filter(unarchivedTasks);
 
         for (Task task : unarchivedTasks)
             if (task.getDateReminder() == 0)
@@ -145,9 +149,6 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         return unarchivedTasks;
     }
 
-    public List<Task> getUnarchivedTasksListOrderedByTime() {
-        return getUnarchivedTasksListByHashtagOrderedByTime(null);
-    }
 
     private Task createTaskFromCursor(Cursor cursor) {
         Task t = new Task();
@@ -200,7 +201,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
             removeTaskFromCache(existingTask);
         }else{
             existingTask.updateModel();
-            setUnarchivedTasksByHeaderOrdered();
+            //TODO: Allows headers to be added, but has to remake the whole map, should be a better way
+            refreshTasksToDisplayByHeader();
         }
     }
 
@@ -209,10 +211,15 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         if(!this.contains(task))
             this.add(task);
 
+        if(taskListFilter.anyFiltersApplied()){
+            if(!task.doesValueExistInHashtagList(taskListFilter.getHashtagFilter()))
+                return;
+        }
+
         //TODO: No way to compare headers to just add it, have to create from scratch (unless header object is made)
         //             tasksToDisplayByHeader.put(header, new ArrayList<Task>());
         if(!tasksToDisplayByHeader.containsKey(header)){
-            setUnarchivedTasksByHeaderOrdered();
+            refreshTasksToDisplayByHeader();
             return;
         }
 
@@ -269,4 +276,5 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     public List<String> getOrderedHeaderList() {
         return orderedHeaderList;
     }
+
 }

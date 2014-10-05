@@ -213,8 +213,8 @@ public class MainActivity extends Activity {
         if (position == 0)
             fragment.loadTasks();
         else{
-            mTitle = "#" + mTitle;
             fragment.loadTasks(mTitle.toString());
+            mTitle = "#" + mTitle;
         }
         mDrawerLayout.closeDrawer(mDrawerList);
     }

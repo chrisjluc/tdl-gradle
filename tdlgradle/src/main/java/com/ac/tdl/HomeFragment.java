@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.ac.tdl.adapter.ExpandableTaskAdapter;
 import com.ac.tdl.managers.TaskManager;
+import com.ac.tdl.managers.helpers.TaskListFilter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
 
@@ -71,7 +72,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadTasks() {
-        taskManager.setUnarchivedTasksByHeaderOrdered();
+        taskManager.setFilter(new TaskListFilter(null));
         if(adapter == null) {
             adapter = new ExpandableTaskAdapter(getActivity(), taskManager.getOrderedHeaderList());
             setAdapter(lvTasks, adapter);
@@ -81,7 +82,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadTasks(String hashtag) {
-        taskManager.setUnArchivedTasksByHeaderAndHashtagOrdered(hashtag);
+        taskManager.setFilter(new TaskListFilter(hashtag));
         adapter.notifyDataSetChanged();
     }
 
@@ -96,14 +97,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         adapter.expandAll();
 
     }
-//TODO: smarter task load
-    /**
-     * Reloads the list, and replaces the specific task.
-     * @param taskId
-     */
-    public void loadTasks(int taskId){
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -115,7 +108,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void addTask() {
-        String taskTitle = etTaskTitle.getText().toString();
+        String taskTitle = etTaskTitle.getText().toString().trim();
         if (taskTitle.isEmpty()) return;
         Task task = new TaskBuilder()
                 .withTaskTitle(taskTitle)

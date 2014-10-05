@@ -48,6 +48,8 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         TaskAdapter taskAdapter = new TaskAdapter(homeActivity, taskManager.getTasksToDisplayByHeader().get(header));
         ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
                 R.layout.undo_row, R.id.undo_row_undobutton, 1500, this);
+        if(adapterByHeader.containsKey(header))
+            adapterByHeader.remove(header);
         adapterByHeader.put(header, adapter);
     }
 
@@ -56,19 +58,15 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         super.notifyDataSetChanged();
         List<String>  headersToRemove = new ArrayList<String>();
         for (String header: adapterByHeader.keySet()){
-            if(!taskManager.getTasksToDisplayByHeader().containsKey(header)){
+            if(!taskManager.getTasksToDisplayByHeader().containsKey(header))
                 headersToRemove.add(header);
-                continue;
-            }
         }
 
         for(String header: headersToRemove)
             adapterByHeader.remove(header);
 
         for (String header: taskManager.getOrderedHeaderList()) {
-            if (!adapterByHeader.containsKey(header)) {
-                createContextualUndoAdapter(header);
-            }
+            createContextualUndoAdapter(header);
         }
         expandAll();
     }
@@ -142,7 +140,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     }
 
     public void expandAll() {
-        for (int i = 0; i < taskManager.getTasksToDisplayByHeader().size(); i++)
+        for (int i = 0; i < adapterByHeader.size(); i++)
             if(!this.isExpanded(i))
                 this.expand(i);
     }

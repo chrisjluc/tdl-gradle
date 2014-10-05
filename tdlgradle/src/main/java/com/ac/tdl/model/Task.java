@@ -208,8 +208,8 @@ public class Task extends Model implements DbContract, Cloneable {
         List<Hashtag> array = getHashtagList();
         if (array == null)
             return false;
-        for (Hashtag oldHashtag : array) {
-            if (oldHashtag.getLabel().equals(value)) {
+        for (Hashtag h : array) {
+            if (h.getLabel().equals(value)) {
                 return true;
             }
         }
