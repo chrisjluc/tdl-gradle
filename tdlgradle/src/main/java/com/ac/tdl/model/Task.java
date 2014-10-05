@@ -94,6 +94,7 @@ public class Task extends Model implements DbContract, Cloneable {
             hashtagManager.save(hashtagObject);
         }
         setHashtagList(hashtagManager.getHashtagsByTaskId(taskId));
+        hashtagManager.notifyDistinctHashtagChanged();
     }
 
     /**
