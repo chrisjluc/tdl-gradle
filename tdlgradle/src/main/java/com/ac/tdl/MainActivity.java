@@ -105,8 +105,10 @@ public class MainActivity extends Activity {
 
         // load slide menu items
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
-
-        mTitle = navMenuTitles[0];
+        if (mTitle == null) {
+            mTitle = navMenuTitles[0];
+            setTitle(mTitle);
+        }
 
         // nav drawer icons from resources
         navMenuIcons = getResources()
