@@ -47,7 +47,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
     private void createContextualUndoAdapter(String header) {
         TaskAdapter taskAdapter = new TaskAdapter(homeActivity, taskManager.getTasksToDisplayByHeader().get(header));
         ContextualUndoAdapter adapter = new ContextualUndoAdapter(taskAdapter,
-                R.layout.undo_row, R.id.undo_row_undobutton, 2000, this);
+                R.layout.undo_row, R.id.undo_row_undobutton, 1500, this);
         adapterByHeader.put(header, adapter);
     }
 
