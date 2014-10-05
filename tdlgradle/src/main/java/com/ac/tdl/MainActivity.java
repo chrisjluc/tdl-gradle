@@ -102,10 +102,11 @@ public class MainActivity extends Activity {
      *  Load drawer list
      */
     public void updateDrawerList() {
-        mTitle = getTitle();
 
         // load slide menu items
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+
+        mTitle = navMenuTitles[0];
 
         // nav drawer icons from resources
         navMenuIcons = getResources()
@@ -205,11 +206,14 @@ public class MainActivity extends Activity {
      * Diplaying fragment view for selected nav drawer list item
      */
     private void displayView(int position) {
+        mTitle = navDrawerItems.get(position).getTitle();
         HomeFragment fragment = getHomeFragment();
         if (position == 0)
             fragment.loadTasks();
-        else
-            fragment.loadTasks(navDrawerItems.get(position).getTitle());
+        else{
+            mTitle = "#" + mTitle;
+            fragment.loadTasks(mTitle.toString());
+        }
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
