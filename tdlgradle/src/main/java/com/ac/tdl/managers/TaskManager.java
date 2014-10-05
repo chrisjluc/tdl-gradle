@@ -30,6 +30,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     private static final String INCOMPLETE = "Incomplete";
     private static final String TODAY = "Today";
 
+    private HashtagManager hashtagManager = HashtagManager.getInstance();
+
     public static TaskManager getInstance() {
         if (instance == null)
             instance = new TaskManager();
@@ -44,14 +46,6 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     public static void nullifyInstance() {
         instance = null;
     }
-
-
-    /*
-    *
-    * Instance properties and methods
-    *
-    *
-    */
 
     public HashMap<String, List<Task>> tasksToDisplayByHeader;
     public List<String> orderedHeaderList;
@@ -87,74 +81,41 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         setTasksToDisplayByHeader(groupTasksByDate(getUnarchivedTasksListByHashtagOrderedByTime(hashtagLabel)));
     }
 
+    private String getHeaderByTask(Task task){
+        long currentDate = getCurrentDate();
+
+        if (task.getDateReminder() > 0) {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(task.getDateReminder());
+            long taskReminderDate = floorDateByDay(c);
+
+            if (taskReminderDate < currentDate)
+                return INCOMPLETE;
+            else if (taskReminderDate == currentDate)
+                return TODAY;
+            else {
+                Date date = new Date(taskReminderDate);
+                return new SimpleDateFormat("EEEE MMM d").format(date);
+            }
+        }
+        return TODAY;
+    }
+
     private HashMap<String, List<Task>> groupTasksByDate(List<Task> tasks) {
         HashMap<String, List<Task>> map = new HashMap<String, List<Task>>();
-        long currentDate = getCurrentDate();
         orderedHeaderList.clear();
 
         for (Task task : tasks) {
 
-            //If Reminderdate is set
-            if (task.getDateReminder() > 0) {
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(task.getDateReminder());
-                long taskReminderDate = floorDateByDay(c);
+            String header = getHeaderByTask(task);
 
-                if (taskReminderDate < currentDate) {
-
-                    if (!map.containsKey(INCOMPLETE)) {
-                        List<Task> tasksList = new ArrayList<Task>();
-                        tasksList.add(task);
-                        map.put(INCOMPLETE, tasksList);
-                        orderedHeaderList.add(INCOMPLETE);
-                    } else {
-                        List<Task> tasksList = map.get(INCOMPLETE);
-                        tasksList.add(task);
-                        map.put(INCOMPLETE, tasksList);
-                    }
-
-                } else if (taskReminderDate == currentDate) {
-
-                    if (!map.containsKey(TODAY)) {
-                        List<Task> tasksList = new ArrayList<Task>();
-                        tasksList.add(task);
-                        map.put(TODAY, tasksList);
-                        orderedHeaderList.add(TODAY);
-                    } else {
-                        List<Task> tasksList = map.get(TODAY);
-                        tasksList.add(task);
-                        map.put(TODAY, tasksList);
-                    }
-
-                } else {
-
-                    Date date = new Date(taskReminderDate);
-                    String dateHeader = new SimpleDateFormat("EEEE MMM d").format(date);
-
-                    if (!map.containsKey(dateHeader)) {
-                        List<Task> tasksList = new ArrayList<Task>();
-                        tasksList.add(task);
-                        map.put(dateHeader, tasksList);
-                        orderedHeaderList.add(dateHeader);
-                    } else {
-                        List<Task> tasksList = map.get(dateHeader);
-                        tasksList.add(task);
-                        map.put(dateHeader, tasksList);
-                    }
-                }
-            } else {
-                //if reminder date is zero, it's not set so just put that task under today
-                if (!map.containsKey(TODAY)) {
-                    List<Task> tasksList = new ArrayList<Task>();
-                    tasksList.add(task);
-                    map.put(TODAY, tasksList);
-                    orderedHeaderList.add(TODAY);
-                } else {
-                    List<Task> tasksList = map.get(TODAY);
-                    tasksList.add(task);
-                    map.put(TODAY, tasksList);
-                }
+            if (!map.containsKey(header)) {
+                map.put(header, new ArrayList<Task>());
+                orderedHeaderList.add(header);
             }
+
+            List<Task> tasksList = map.get(header);
+            tasksList.add(task);
         }
         return map;
     }
@@ -187,51 +148,6 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
     public List<Task> getUnarchivedTasksListOrderedByTime() {
         return getUnarchivedTasksListByHashtagOrderedByTime(null);
     }
-
-      /* List<Task> orderedTaskList = new ArrayList<Task>();
-        List<Task> emptyReminderTaskList = new ArrayList<Task>();
-        while (cursor.moveToNext()) {
-            Task t = new Task();
-            t.setTaskId(cursor.getInt(cursor
-                    .getColumnIndexOrThrow(DbContract.TaskTable.COLUMN_NAME_ID)));
-            t.getModelFromDb();
-
-            if (t.getDateReminder() == 0)
-                emptyReminderTaskList.add(t);
-            else
-                orderedTaskList.add(t);
-        }
-        if (orderedTaskList.size() == 0)
-            return emptyReminderTaskList;
-        else if (emptyReminderTaskList.size() > 0)
-            return mergeListsOnReminderDate(orderedTaskList, emptyReminderTaskList);
-
-        return orderedTaskList;
-    }
-
-    private List<Task> mergeListsOnReminderDate(List<Task> orderedTaskList, List<Task> emptyReminderTaskList) {
-        List<Task> mergedTaskList = new ArrayList<Task>();
-        int index = 0;
-
-        //12:00 am of currentday
-        long currentDayTimestamp = getCurrentDate();
-
-        for (Task orderedTask : orderedTaskList) {
-
-            //Ordered tasks at 12:00 am on current date will appear after empty reminders
-            if (orderedTask.getDateReminder() >= currentDayTimestamp) {
-                mergedTaskList.addAll(emptyReminderTaskList);
-                emptyReminderTaskList = null;
-                break;
-            }
-            mergedTaskList.add(orderedTask);
-            index++;
-        }
-        if (emptyReminderTaskList != null)
-            mergedTaskList.addAll(emptyReminderTaskList);
-        mergedTaskList.addAll(orderedTaskList.subList(index, orderedTaskList.size()));
-        return mergedTaskList;
-    }*/
 
     private Task createTaskFromCursor(Cursor cursor) {
         Task t = new Task();
@@ -273,15 +189,48 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         return null;
     }
 
+
     public void save(Task task) {
         Task existingTask = getTaskById(task.getTaskId());
         if (existingTask == null) {
             task.saveModel();
-            this.add(task);
-        } else {
+            addTaskToCache(task);
+        } else if (existingTask.isArchived()) {
             existingTask.updateModel();
+            removeTaskFromCache(existingTask);
+        }else{
+            existingTask.updateModel();
+            setUnarchivedTasksByHeaderOrdered();
         }
-        setUnarchivedTasksByHeaderOrdered();
+    }
+
+    private void addTaskToCache(Task task){
+        String header = getHeaderByTask(task);
+        if(!this.contains(task))
+            this.add(task);
+
+        //TODO: No way to compare headers to just add it, have to create from scratch (unless header object is made)
+        //             tasksToDisplayByHeader.put(header, new ArrayList<Task>());
+        if(!tasksToDisplayByHeader.containsKey(header)){
+            setUnarchivedTasksByHeaderOrdered();
+            return;
+        }
+
+        if(!tasksToDisplayByHeader.get(header).contains(task))
+            tasksToDisplayByHeader.get(header).add(task);
+    }
+
+    private void removeTaskFromCache(Task task){
+        String header = getHeaderByTask(task);
+        if(tasksToDisplayByHeader.containsKey(header)
+                && tasksToDisplayByHeader.get(header).contains(task)) {
+            List<Task> list = tasksToDisplayByHeader.get(header);
+            list.remove(task);
+            if(list.size() == 0) {
+                tasksToDisplayByHeader.remove(header);
+                orderedHeaderList.remove(header);
+            }
+        }
     }
 
     protected static int getIntFromBool(boolean isTrue) {

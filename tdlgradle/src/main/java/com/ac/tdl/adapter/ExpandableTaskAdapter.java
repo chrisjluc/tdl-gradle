@@ -60,10 +60,6 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
                 headersToRemove.add(header);
                 continue;
             }
-            ContextualUndoAdapter adapter = adapterByHeader.get(header);
-            TaskAdapter taskAdapter = (TaskAdapter) adapter.getDecoratedBaseAdapter();
-            taskAdapter.clear();
-            taskAdapter.addAll(taskManager.getTasksToDisplayByHeader().get(header));
         }
 
         for(String header: headersToRemove)
@@ -140,7 +136,6 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         int parentId = parent.getId();
         List<Task> associatedTasks = taskManager.getTasksToDisplayByHeader().get(getItem(parentId));
         Task task = associatedTasks.get(position);
-        associatedTasks.remove(position);
         task.setArchived(true);
         taskManager.save(task);
         this.notifyDataSetChanged();
@@ -148,6 +143,7 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
 
     public void expandAll() {
         for (int i = 0; i < taskManager.getTasksToDisplayByHeader().size(); i++)
-            this.expand(i);
+            if(!this.isExpanded(i))
+                this.expand(i);
     }
 }

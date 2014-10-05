@@ -36,7 +36,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private TaskManager taskManager = TaskManager.getInstance();
 
     ExpandableTaskAdapter adapter;
-    HashMap<String, List<Task>> tasksByHeader;
 
     public HomeFragment() {
     }
