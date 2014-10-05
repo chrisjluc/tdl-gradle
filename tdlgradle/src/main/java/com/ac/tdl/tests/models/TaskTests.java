@@ -3,6 +3,7 @@ package com.ac.tdl.tests.models;
 import android.test.AndroidTestCase;
 
 import com.ac.tdl.SQL.DbHelper;
+import com.ac.tdl.managers.HashtagManager;
 import com.ac.tdl.managers.TaskManager;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
@@ -60,24 +61,24 @@ public class TaskTests extends AndroidTestCase {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_FIRST_HASHTAG).build();
         taskManager.save(task);
 
-        assertEquals(1,task.getHashtagArray().length);
+        assertEquals(1,task.getHashtagList().size());
         task.setTaskTitle(TASK_TITLE_WITH_TWO_HASHTAGS);
         taskManager.save(task);
         Task task1 = taskManager.getTaskById(task.getTaskId());
-        assertEquals(2,task1.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG,task1.getHashtagArray()[0].getLabel());
-        assertEquals(SECOND_HASHTAG,task1.getHashtagArray()[1].getLabel());
+        assertEquals(2,task1.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG,task1.getHashtagList().get(0).getLabel());
+        assertEquals(SECOND_HASHTAG, task1.getHashtagList().get(1).getLabel());
     }
 
     public void testUpdateTaskTitleDeletingOldHashtag() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_TWO_HASHTAGS).build();
         taskManager.save(task);
-        assertEquals(2,task.getHashtagArray().length);
+        assertEquals(2,task.getHashtagList().size());
         task.setTaskTitle(TASK_TITLE_WITH_FIRST_HASHTAG);
         taskManager.save(task);
         Task task1 = taskManager.getTaskById(task.getTaskId());
-        assertEquals(1,task1.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG,task1.getHashtagArray()[0].getLabel());
+        assertEquals(1,task1.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG, task1.getHashtagList().get(0).getLabel());
     }
 
     public void testUpdateTaskDetails() throws Exception {
@@ -106,11 +107,11 @@ public class TaskTests extends AndroidTestCase {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_FIRST_HASHTAG).build();
         taskManager.save(task);
 
-        assertEquals(1,task.getHashtagArray().length);
+        assertEquals(1,task.getHashtagList().size());
         task.setArchived(true);
         taskManager.save(task);
         Task task1 = taskManager.getTaskById(task.getTaskId());
-        assertEquals(null,task1.getHashtagArray());
+        assertEquals(null,task1.getHashtagList());
     }
 
     public void test2TasksSameHashtagWith1Archived() {
@@ -121,16 +122,16 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task1);
 
 
-        assertEquals(1,task.getHashtagArray().length);
-        assertEquals(1,task1.getHashtagArray().length);
+        assertEquals(1,task.getHashtagList().size());
+        assertEquals(1,task1.getHashtagList().size());
 
         task.setArchived(true);
         taskManager.save(task);
 
-        assertEquals(1,task1.getHashtagArray().length);
+        assertEquals(1,task1.getHashtagList().size());
 
         Task taskFromDb = taskManager.getTaskById(task1.getTaskId());
-        assertEquals(1,taskFromDb.getHashtagArray().length);
+        assertEquals(1,taskFromDb.getHashtagList().size());
     }
 
     public void testAddTwoTasksGettingItFromDb() throws Exception {
@@ -152,39 +153,39 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task);
 
         assertFalse(task.getTaskTitle().isEmpty());
-        assertEquals(null, task.getHashtagArray());
+        assertEquals(null, task.getHashtagList());
     }
 
     public void testAddTaskWithInvalidHashtags() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_NO_VALID_HASHTAG).build();
         taskManager.save(task);
 
-        assertEquals(null, task.getHashtagArray());
+        assertEquals(null, task.getHashtagList());
     }
 
     public void testAddTaskWithOneHashtag() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_FIRST_HASHTAG).build();
         taskManager.save(task);
 
-        assertEquals(1, task.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG, task.getHashtagArray()[0].getLabel());
+        assertEquals(1, task.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG, task.getHashtagList().get(0).getLabel());
     }
 
     public void testAddTaskWithAnotherHashtag() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_THIRD_HASHTAGS).build();
         taskManager.save(task);
 
-        assertEquals(1, task.getHashtagArray().length);
-        assertEquals(THIRD_HASHTAG, task.getHashtagArray()[0].getLabel());
+        assertEquals(1, task.getHashtagList().size());
+        assertEquals(THIRD_HASHTAG, task.getHashtagList().get(0).getLabel());
     }
 
     public void testAddTaskWithTwoHashtags() throws Exception {
         Task task = new TaskBuilder().withTaskTitle(TASK_TITLE_WITH_TWO_HASHTAGS).build();
         taskManager.save(task);
 
-        assertEquals(2, task.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG,task.getHashtagArray()[0].getLabel());
-        assertEquals(SECOND_HASHTAG,task.getHashtagArray()[1].getLabel());
+        assertEquals(2, task.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG, task.getHashtagList().get(0).getLabel());
+        assertEquals(SECOND_HASHTAG, task.getHashtagList().get(1).getLabel());
     }
 
     public void testAddTaskWithEmptyHashtagArrayByGettingModelInDb() throws Exception {
@@ -193,7 +194,7 @@ public class TaskTests extends AndroidTestCase {
 
         Task taskFromDb = taskManager.getTaskById(task.getTaskId());
         assertFalse(taskFromDb.getTaskTitle().isEmpty());
-        assertEquals(null, taskFromDb.getHashtagArray());
+        assertEquals(null, taskFromDb.getHashtagList());
     }
 
     public void testAddTaskWithInvalidHashtagsByGettingModelInDb() throws Exception {
@@ -201,7 +202,7 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task);
 
         Task taskFromDb = taskManager.getTaskById(task.getTaskId());
-        assertEquals(null, taskFromDb.getHashtagArray());
+        assertEquals(null, taskFromDb.getHashtagList());
     }
 
     public void testAddTaskWithOneHashtagByGettingModelInDb() throws Exception {
@@ -209,8 +210,8 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task);
 
         Task taskFromDb = taskManager.getTaskById(task.getTaskId());
-        assertEquals(1, taskFromDb.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG, taskFromDb.getHashtagArray()[0].getLabel());
+        assertEquals(1, taskFromDb.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG, taskFromDb.getHashtagList().get(0).getLabel());
     }
 
     public void testAddTaskWithAnotherHashtagByGettingModelInDb() throws Exception {
@@ -218,8 +219,8 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task);
 
         Task taskFromDb = taskManager.getTaskById(task.getTaskId());
-        assertEquals(1, taskFromDb.getHashtagArray().length);
-        assertEquals(THIRD_HASHTAG, taskFromDb.getHashtagArray()[0].getLabel());
+        assertEquals(1, taskFromDb.getHashtagList().size());
+        assertEquals(THIRD_HASHTAG, taskFromDb.getHashtagList().get(0).getLabel());
     }
 
     public void testAddTaskWithTwoHashtagsByGettingModelInDb() throws Exception {
@@ -227,15 +228,16 @@ public class TaskTests extends AndroidTestCase {
         taskManager.save(task);
 
         Task taskFromDb = taskManager.getTaskById(task.getTaskId());
-        assertEquals(2, taskFromDb.getHashtagArray().length);
-        assertEquals(FIRST_HASHTAG,taskFromDb.getHashtagArray()[0].getLabel());
-        assertEquals(SECOND_HASHTAG,taskFromDb.getHashtagArray()[1].getLabel());
+        assertEquals(2, taskFromDb.getHashtagList().size());
+        assertEquals(FIRST_HASHTAG, taskFromDb.getHashtagList().get(0).getLabel());
+        assertEquals(SECOND_HASHTAG,taskFromDb.getHashtagList().get(1).getLabel());
     }
 
     @Override
     protected void tearDown() throws Exception{
         DbHelper.getInstance().clear();
         TaskManager.nullifyInstance();
+        HashtagManager.getInstance().nullifyInstance();
         super.tearDown();
     }
 }
