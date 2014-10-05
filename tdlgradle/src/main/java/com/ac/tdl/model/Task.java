@@ -12,7 +12,7 @@ import com.ac.tdl.managers.HashtagManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Task extends Model implements DbContract {
+public class Task extends Model implements DbContract, Cloneable {
 
     // Stored in SQL
     private long taskId;
@@ -197,6 +197,11 @@ public class Task extends Model implements DbContract {
             setHashtagList(null);
 
     }
+    public Task clone() throws CloneNotSupportedException{
+        Task clone=(Task)super.clone();
+        clone.setHashtagList(getCopyOfHashtagList());
+        return clone;
+    }
 
     public boolean doesValueExistInHashtagList(String value) {
         List<Hashtag> array = getHashtagList();
@@ -255,7 +260,7 @@ public class Task extends Model implements DbContract {
             for (Hashtag hashtag : h)
                 copy.add(hashtag.clone());
         }catch(Exception e){
-            Log.d("Task", e.toString());
+            Log.d("Task - getCopyOfHashtagList", e.toString());
         }
         return copy;
     }

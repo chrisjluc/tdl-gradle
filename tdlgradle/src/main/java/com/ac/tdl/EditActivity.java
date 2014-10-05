@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -84,7 +85,11 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         Intent intent = getIntent();
         if (intent != null) {
             long id = intent.getLongExtra("taskId", 0L);
-            task = TaskManager.getInstance().getTaskById(id);
+            try {
+                task = TaskManager.getInstance().getTaskById(id).clone();
+            }catch(Exception e){
+                Log.d("EditActivity clone of Task not supported", e.toString());
+            }
 
         }
         setupViews();
@@ -172,9 +177,12 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
                 finish();
                 break;
             case R.id.bEditSave:
+                Task task = taskManager.getTaskById(this.task.getTaskId());
                 task.setPriority(cbPriority.isChecked());
                 if (calendar != null)
                     task.setDateReminder(calendar.getTimeInMillis());
+                task.setTaskTitle(tvTaskTitle.getText().toString());
+                task.setTaskDetails(tvTaskDetail.getText().toString());
                 taskManager.save(task);
                 Intent saveIntent = new Intent();
                 saveIntent.putExtra("isSaved", true);
