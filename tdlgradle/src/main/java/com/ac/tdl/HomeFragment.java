@@ -126,9 +126,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         hideKeyboard(etTaskTitle);
 
         adapter.notifyDataSetChanged();
-        ((MainActivity)getActivity()).updateDrawerList();
     }
-
     @SuppressWarnings("static-access")
     private void hideKeyboard(EditText et) {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
