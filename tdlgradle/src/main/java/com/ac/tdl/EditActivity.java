@@ -53,8 +53,10 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
 
         @Override
         public void onDateChosen(int nYear, int nMonth, int nDay) {
+            boolean floorDate = false;
             if (calendar == null) {
                 calendar = Calendar.getInstance();
+                floorDate = true;
             }
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -62,6 +64,8 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
             calendar.add(Calendar.YEAR, nYear - year);
             calendar.add(Calendar.MONTH, nMonth - month);
             calendar.add(Calendar.DAY_OF_YEAR, nDay - day);
+            if(floorDate)
+                calendar.setTimeInMillis(GenericHelper.floorDateByDay(calendar));
             tvDate.setText(dateFormat.format(calendar.getTime()));
         }
 
@@ -236,6 +240,7 @@ public class EditActivity extends FragmentActivity implements View.OnClickListen
         public void onDateSet(DatePicker view, int nYear, int nMonth, int nDay) {
             dl.onDateChosen(nYear, nMonth, nDay);
         }
+
     }
 
     public static class TimePickerFragment extends DialogFragment
