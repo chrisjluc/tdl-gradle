@@ -115,7 +115,6 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         task.updateArchived(true);
 
         homeActivity.getHomeFragment().loadTasks();
-        homeActivity.updateDrawerList();
     }
 
     public void expandAll() {
