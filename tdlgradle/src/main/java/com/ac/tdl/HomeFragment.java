@@ -5,8 +5,6 @@ package com.ac.tdl;
  */
 
 import android.app.Fragment;
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,7 +20,6 @@ import android.widget.TextView;
 import com.ac.tdl.adapter.ExpandableTaskAdapter;
 import com.ac.tdl.model.Task;
 import com.ac.tdl.model.TaskBuilder;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.contextualundo.ContextualUndoAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +32,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private EditText etTaskTitle;
     private ImageButton bAdd;
     private ListView lvTasks;
-    private HashMap<Integer, List<Task>> tasksByParentId;
 
     HashMap<String, List<Task>> tasksByHeader;
     List<String> orderedHeaderList;

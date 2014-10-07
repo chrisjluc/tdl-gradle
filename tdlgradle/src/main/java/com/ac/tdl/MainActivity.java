@@ -141,6 +141,7 @@ public class MainActivity extends Activity {
                 if (result) {
                     HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById(R.id.frame_container);
                     fragment.loadTasks();
+                    updateDrawerList();
                 }
             }
     }
