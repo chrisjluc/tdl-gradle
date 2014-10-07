@@ -81,6 +81,11 @@ public class ExpandableTaskAdapter extends ExpandableListItemAdapter<String> imp
         TextView tvHeader = (TextView) view.findViewById(R.id.tvHeader);
         String header = getItem(i);
         tvHeader.setText(header);
+
+        TextView tvTaskNumber = (TextView) view.findViewById(R.id.tvTaskNumber);
+        String number = Integer.toString(taskManager.getTasksToDisplayByHeader().get(getItem(i)).size());
+        tvTaskNumber.setText(number);
+
         return view;
     }
 

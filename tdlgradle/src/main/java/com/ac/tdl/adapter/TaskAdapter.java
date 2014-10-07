@@ -1,6 +1,7 @@
 package com.ac.tdl.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,10 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         TextView tvTaskTitle = (TextView) view.findViewById(R.id.tvTaskTitle);
         final Task task = getItem(position);
         tvTaskTitle.setText(task.getTaskTitle());
+        if(task.isPriority())
+            tvTaskTitle.setTextColor(Color.RED);
+        else
+            tvTaskTitle.setTextColor(Color.BLACK);
         return view;
     }
 }

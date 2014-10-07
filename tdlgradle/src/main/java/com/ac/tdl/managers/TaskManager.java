@@ -84,7 +84,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
 
 
     public void refreshTasksToDisplayByHeader() {
-        groupTasksToDisplayByDate(getUnarchivedTasksListOrderedByTime());
+        groupTasksToDisplayByDateAndPriority(getUnarchivedTasksListOrderedByTime());
         if(daysToHighlightListener != null)
             daysToHighlightListener.notifyChange(getDistinctTimestampsToHighlight());
     }
@@ -109,7 +109,8 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         return TODAY;
     }
 
-    private void groupTasksToDisplayByDate(List<Task> tasks) {
+    private void groupTasksToDisplayByDateAndPriority(List<Task> tasks) {
+
         if(tasksToDisplayByHeader == null)
             tasksToDisplayByHeader = new HashMap<String, List<Task>>();
         else
@@ -125,8 +126,16 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
                 tasksToDisplayByHeader.put(header, new ArrayList<Task>());
                 orderedHeaderList.add(header);
             }
-            tasksToDisplayByHeader.get(header).add(task);
+
+            addToTasksToDisplayByHeaderWithPriority(task, header);
         }
+    }
+
+    private void addToTasksToDisplayByHeaderWithPriority(Task task, String header){
+        if(task.isPriority())
+            tasksToDisplayByHeader.get(header).add(0,task);
+        else
+            tasksToDisplayByHeader.get(header).add(task);
     }
 
     public void setDistinctDaysToHighlightChangeListener(CalendarFragment.DistinctDaysToHighlightChangeListener listener) {
@@ -248,7 +257,7 @@ public class TaskManager extends ArrayList<Task> implements ITaskManager {
         }
 
         if(!tasksToDisplayByHeader.get(header).contains(task)){
-            tasksToDisplayByHeader.get(header).add(task);
+            addToTasksToDisplayByHeaderWithPriority(task, header);
             if (daysToHighlightListener != null)
                 daysToHighlightListener.notifyChange(getDistinctTimestampsToHighlight());
         }
