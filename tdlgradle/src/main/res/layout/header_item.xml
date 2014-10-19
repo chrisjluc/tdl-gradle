@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,7 +10,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#000000"
+        android:text="title"
         android:textSize="14sp"
         android:fontFamily="sans-serif-thin"/>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvTaskNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:text="numberTasks"
+        android:layout_alignParentRight="true"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-thin"/>
+
+
+</RelativeLayout>
